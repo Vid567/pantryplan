@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PantryPlan — Guide</title>
+<style>
+:root{--brand:#b45309;--brand-light:#fef3e2;--green:#059669;--green-light:#d1fae5;
+  --blue:#2563eb;--blue-light:#dbeafe;--red:#dc2626;
+  --bg:#faf7f2;--surface:#fff;--border:#e7e0d4;--text:#1c1917;--text2:#78716c;
+  --radius:16px;--font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
+
+.hero{background:var(--brand);color:#fff;padding:32px 20px 24px;text-align:center}
+.hero h1{font-size:26px;font-weight:800}
+.hero p{margin-top:6px;font-size:14px;opacity:.85}
+.chips{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600}
+
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;
+  position:sticky;top:0;z-index:10;display:flex;gap:6px;flex-wrap:wrap;overflow-x:auto}
+nav a{background:var(--brand-light);color:var(--brand);border-radius:20px;padding:5px 11px;
+  font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap}
+nav a:hover{background:var(--brand);color:#fff}
+
+.section{max-width:860px;margin:0 auto;padding:36px 16px}
+.section+.section{border-top:2px solid var(--border)}
+.eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--brand);margin-bottom:4px}
+h2{font-size:21px;font-weight:800;margin-bottom:6px}
+.intro{color:var(--text2);font-size:14px;margin-bottom:20px;max-width:540px}
+
+/* STEP GRID */
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+
+/* PHONE MOCKUP */
+.mockup{background:#1a1a1a;border-radius:24px 24px 0 0;padding:8px 8px 0;margin:0}
+.mockup-screen{background:#faf7f2;border-radius:18px 18px 0 0;overflow:hidden;min-height:260px;position:relative}
+
+/* screen UI elements */
+.sc-header{background:#fff;padding:12px 14px 8px;border-bottom:1px solid #e7e0d4}
+.sc-title{font-size:16px;font-weight:800;color:#1c1917}
+.sc-sub{font-size:11px;color:#78716c;margin-top:1px}
+.sc-mic{background:#dbeafe;border-radius:12px;margin:8px;padding:10px 12px;display:flex;align-items:center;gap:8px}
+.sc-mic.active{background:#2563eb}
+.sc-mic.active span{color:#fff;font-weight:700}
+.sc-mic-icon{font-size:16px}
+.sc-mic span{font-size:12px;color:#1e40af;font-weight:600}
+.sc-hint{font-size:10px;color:#78716c;margin:0 8px 6px;line-height:1.4}
+.sc-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px}
+.sc-stat{background:#fff;border:1px solid #e7e0d4;border-radius:10px;padding:8px 10px}
+.sc-stat-label{font-size:9px;color:#78716c;text-transform:uppercase;letter-spacing:.5px}
+.sc-stat-val{font-size:20px;font-weight:800;color:#1c1917}
+.sc-vlog{background:#d1fae5;border-radius:10px;margin:8px;padding:8px 10px}
+.sc-vlog-title{font-size:10px;font-weight:700;color:#059669;margin-bottom:4px;display:flex;justify-content:space-between}
+.sc-vlog-undo{font-size:9px;background:#fff;color:#059669;border:1px solid #059669;border-radius:5px;padding:1px 6px}
+.sc-vlog-row{display:flex;justify-content:space-between;font-size:11px;color:#1c1917;padding:1px 0}
+.sc-vlog-row b{color:#059669}
+.sc-transcript{background:#dbeafe;border-radius:10px;margin:6px 8px;padding:7px 10px;font-size:11px;color:#1e40af;font-style:italic}
+.sc-add-btn{margin:8px;border:2px dashed #d6cfc5;border-radius:12px;padding:10px;text-align:center;font-size:13px;color:#78716c}
+.sc-cat{margin:8px 8px 2px;font-size:10px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:4px}
+.sc-item{background:#fff;margin:0 8px;border-bottom:1px solid #f0ebe3;padding:8px 6px;display:flex;align-items:center;gap:8px}
+.sc-item:last-child{border-bottom:none;margin-bottom:8px;border-radius:0 0 10px 10px}
+.sc-item:first-of-type{border-radius:10px 10px 0 0}
+.sc-thumb{width:36px;height:36px;border-radius:8px;background:#f0ebe3;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden}
+.sc-thumb img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.sc-item-name{flex:1;font-size:13px;font-weight:600;color:#1c1917}
+.sc-item-sub{font-size:10px;color:#78716c}
+.sc-item-sub.low{color:#d97706}
+.sc-qtys{display:flex;align-items:center;gap:4px}
+.sc-q-btn{width:26px;height:26px;border-radius:7px;background:#f0ebe3;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#78716c}
+.sc-q-num{font-size:13px;font-weight:700;width:18px;text-align:center}
+.sc-to-list{display:flex;flex-direction:column;align-items:center;font-size:16px;margin-left:4px}
+.sc-to-list small{font-size:8px;color:#78716c;font-weight:600}
+
+/* shop items */
+.sc-shop-item{background:#fff;margin:0 8px;border-bottom:1px solid #f0ebe3;padding:8px 6px;display:flex;align-items:center;gap:8px}
+.sc-shop-item:last-child{border-bottom:none;border-radius:0 0 10px 10px;margin-bottom:8px}
+.sc-bin{font-size:18px;color:#78716c;margin-left:auto}
+
+/* edit modal */
+.sc-modal{background:#fff;border-radius:20px 20px 0 0;position:absolute;bottom:0;left:0;right:0;padding:16px}
+.sc-modal-handle{width:36px;height:3px;background:#d6d3d1;border-radius:2px;margin:0 auto 12px}
+.sc-modal-title{font-size:16px;font-weight:800;margin-bottom:12px}
+.sc-modal-close{position:absolute;top:12px;right:14px;width:28px;height:28px;border-radius:8px;background:#f0ebe3;display:flex;align-items:center;justify-content:center;font-size:13px;color:#78716c}
+.sc-field{margin-bottom:10px}
+.sc-label{font-size:10px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.sc-input{background:#faf7f2;border:1px solid #e7e0d4;border-radius:8px;padding:8px 10px;font-size:13px;color:#1c1917;width:100%}
+.sc-cats{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.sc-cat-chip{background:#faf7f2;border:1px solid #e7e0d4;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600;color:#78716c}
+.sc-cat-chip.sel{background:var(--brand-light);border-color:var(--brand);color:var(--brand)}
+.sc-photo-btn{background:#faf7f2;border:1px solid #e7e0d4;border-radius:10px;padding:8px 12px;font-size:12px;color:#78716c;margin-bottom:8px}
+.sc-photo-preview{width:52px;height:52px;border-radius:8px;object-fit:cover;border:1px solid #e7e0d4;margin-right:8px}
+.sc-actions{display:flex;gap:8px}
+.sc-btn-cancel{flex:1;background:#f0ebe3;border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;color:#78716c}
+.sc-btn-save{flex:1;background:var(--brand);border-radius:10px;padding:10px;text-align:center;font-size:13px;font-weight:600;color:#fff}
+.sc-btn-del{width:100%;background:#fee2e2;border-radius:10px;padding:9px;text-align:center;font-size:12px;font-weight:600;color:#dc2626;margin-top:6px}
+
+/* tabs */
+.sc-tabs{background:#fff;border-top:1px solid #e7e0d4;display:flex;padding:6px 0 2px}
+.sc-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:#78716c;font-weight:600}
+.sc-tab.active{color:var(--brand)}
+.sc-tab-icon{font-size:18px}
+.sc-badge{background:#dc2626;color:#fff;font-size:8px;font-weight:700;border-radius:8px;padding:1px 4px;margin-left:-6px;margin-top:-14px}
+
+/* CARD BODY */
+.card-body{padding:14px}
+.step-num{width:24px;height:24px;border-radius:7px;background:var(--brand);color:#fff;
+  font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px}
+.card-body h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.card-body p{font-size:12px;color:var(--text2);line-height:1.5}
+.tip{display:flex;gap:6px;margin-top:8px;background:var(--brand-light);border-radius:8px;padding:7px 9px;font-size:11px;color:var(--brand);font-weight:500}
+.tip-green{background:var(--green-light);color:#065f46}
+
+/* CALLOUT OVERLAY */
+.overlay{position:absolute;pointer-events:none}
+.callout{position:absolute;background:var(--brand);color:#fff;font-size:10px;font-weight:700;
+  border-radius:8px;padding:4px 8px;white-space:nowrap;z-index:5}
+.callout::after{content:'';position:absolute;border:5px solid transparent}
+.callout.down::after{border-top-color:var(--brand);top:100%;left:50%;transform:translateX(-50%)}
+.callout.up::after{border-bottom-color:var(--brand);bottom:100%;left:50%;transform:translateX(-50%)}
+.callout.right::after{border-left-color:var(--brand);left:100%;top:50%;transform:translateY(-50%)}
+.ring{position:absolute;border:2px solid var(--brand);border-radius:8px;background:rgba(180,83,9,.08);z-index:4}
+
+/* VOICE TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}
+th{text-align:left;padding:8px 10px;background:var(--brand);color:#fff;font-weight:600;font-size:12px}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+em{color:var(--brand);font-style:normal;font-weight:600}
+.tag{display:inline-block;background:var(--green-light);color:var(--green);border-radius:5px;padding:1px 6px;font-size:10px;font-weight:700}
+
+/* TIP BAR */
+.tip-bar{background:var(--green-light);border-left:4px solid var(--green);border-radius:0 10px 10px 0;
+  padding:10px 14px;margin:16px 0;font-size:13px;color:#065f46;font-weight:500}
+.tip-bar strong{display:block;margin-bottom:2px;font-size:14px}
+.tip-bar.blue{background:var(--blue-light);border-color:var(--blue);color:#1e3a8a}
+
+footer{text-align:center;padding:28px 16px;color:var(--text2);font-size:12px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🥫 PantryPlan — Guide</h1>
+  <p>Visual guide to every screen and feature.</p>
+  <div class="chips">
+    <span class="chip">🎤 Voice (auto-stops)</span>
+    <span class="chip">🥫 Pantry</span>
+    <span class="chip">🛒 Shopping</span>
+    <span class="chip">✕ Fix mistakes</span>
+    <span class="chip">📷 Photos</span>
+  </div>
+</div>
+
+<nav>
+  <a href="#screens">Screens</a>
+  <a href="#voice">Voice</a>
+  <a href="#add-pantry">Add items</a>
+  <a href="#shopping">Shopping</a>
+  <a href="#fix">Fix mistakes</a>
+  <a href="#edit">Edit & delete</a>
+  <a href="#photo">Photos</a>
+</nav>
+
+
+<!-- ═══ SCREENS ═══ -->
+<section class="section" id="screens">
+  <div class="eyebrow">Tour</div>
+  <h2>The three screens</h2>
+  <p class="intro">PantryPlan has three tabs at the bottom. Tap each one to switch.</p>
+
+  <div class="grid">
+
+    <!-- PANTRY TAB -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div><div class="sc-sub">What you have at home.</div></div>
+          <div class="sc-mic"><span class="sc-mic-icon">🎤</span><span>Speak to add or update</span></div>
+          <div class="sc-stats"><div class="sc-stat"><div class="sc-stat-label">Items</div><div class="sc-stat-val">10</div></div><div class="sc-stat"><div class="sc-stat-label">Running low</div><div class="sc-stat-val">3</div></div></div>
+          <div class="sc-add-btn">＋ Add item</div>
+          <div class="sc-cat">🌾 Staples</div>
+          <div style="background:#fff;margin:0 8px;border-radius:10px">
+            <div class="sc-item"><div class="sc-thumb">🌾</div><div style="flex:1"><div class="sc-item-name">Rice</div><div class="sc-item-sub low">Running low</div></div><div class="sc-qtys"><div class="sc-q-btn">−</div><div class="sc-q-num">1</div><div class="sc-q-btn">＋</div></div><div class="sc-to-list">📋<small>to list</small></div></div>
+            <div class="sc-item"><div class="sc-thumb">🌾</div><div style="flex:1"><div class="sc-item-name">Pasta</div><div class="sc-item-sub"></div></div><div class="sc-qtys"><div class="sc-q-btn">−</div><div class="sc-q-num">3</div><div class="sc-q-btn">＋</div></div><div class="sc-to-list">📋<small>to list</small></div></div>
+          </div>
+          <div style="height:8px"></div>
+          <div class="sc-tabs">
+            <div class="sc-tab active"><div class="sc-tab-icon">🥫</div>Pantry</div>
+            <div class="sc-tab"><div class="sc-tab-icon">🛒</div>Shopping</div>
+            <div class="sc-tab"><div class="sc-tab-icon">⚙️</div>More</div>
+          </div>
+          <div class="ring" style="bottom:28px;left:4px;width:33%;height:36px"></div>
+          <div class="callout down" style="bottom:68px;left:6px">Active tab</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">1</div>
+        <h3>🥫 Pantry — what you have</h3>
+        <p>Lists everything by category. Use − / + to adjust stock. At 0 an item automatically goes on your shopping list. Tap 📋 to add to the list manually.</p>
+      </div>
+    </div>
+
+    <!-- SHOPPING TAB -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🛒 Shopping</div><div class="sc-sub">Your list for the store.</div></div>
+          <div class="sc-mic"><span class="sc-mic-icon">🎤</span><span>Speak to add or update</span></div>
+          <div class="sc-add-btn">＋ Add to list</div>
+          <div style="background:#fff;margin:8px;border-radius:10px">
+            <div class="sc-shop-item"><div class="sc-thumb">🥛</div><div style="flex:1"><div class="sc-item-name">Milk</div><div class="sc-item-sub">×2</div></div><div class="sc-bin">🗑</div></div>
+            <div class="sc-shop-item"><div class="sc-thumb">🥚</div><div style="flex:1"><div class="sc-item-name">Chicken eggs</div><div class="sc-item-sub">×1</div></div><div class="sc-bin">🗑</div></div>
+            <div class="sc-shop-item"><div class="sc-thumb">🌾</div><div style="flex:1"><div class="sc-item-name">Rice</div><div class="sc-item-sub">×1</div></div><div class="sc-bin">🗑</div></div>
+          </div>
+          <div style="height:8px"></div>
+          <div class="sc-tabs">
+            <div class="sc-tab"><div class="sc-tab-icon">🥫</div>Pantry</div>
+            <div class="sc-tab active"><div class="sc-tab-icon">🛒</div>Shopping<div class="sc-badge">3</div></div>
+            <div class="sc-tab"><div class="sc-tab-icon">⚙️</div>More</div>
+          </div>
+          <div class="ring" style="bottom:2px;left:2px;right:2px;height:38px;border-radius:10px;background:rgba(180,83,9,.05)"></div>
+          <div class="callout down" style="bottom:44px;right:4px">Tap 🗑 = bought → removes from list + adds to pantry</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">2</div>
+        <h3>🛒 Shopping — your list</h3>
+        <p>Everything to buy. In the store: item goes in your cart → tap 🗑 → it leaves the list and lands in your pantry automatically. One tap, done.</p>
+      </div>
+    </div>
+
+    <!-- MORE TAB -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen">
+          <div class="sc-header"><div class="sc-title">⚙️ More</div></div>
+          <div style="padding:12px 8px">
+            <div style="background:#fff;border:1px solid #e7e0d4;border-radius:10px;padding:12px;margin-bottom:8px;font-size:13px;font-weight:600">📤 Export data</div>
+            <div style="background:#fff;border:1px solid #e7e0d4;border-radius:10px;padding:12px;margin-bottom:8px;font-size:13px;font-weight:600">📥 Import backup</div>
+            <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:10px;padding:12px;font-size:13px;font-weight:600;color:#dc2626">🗑 Erase everything</div>
+          </div>
+          <div class="sc-tabs">
+            <div class="sc-tab"><div class="sc-tab-icon">🥫</div>Pantry</div>
+            <div class="sc-tab"><div class="sc-tab-icon">🛒</div>Shopping</div>
+            <div class="sc-tab active"><div class="sc-tab-icon">⚙️</div>More</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">3</div>
+        <h3>⚙️ More — backup</h3>
+        <p>Export your pantry as a backup file. Import it on any device. Erase everything to start fresh. Your data stays on your phone only.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══ VOICE ═══ -->
+<section class="section" id="voice">
+  <div class="eyebrow">Voice</div>
+  <h2>🎤 Using your voice</h2>
+  <p class="intro">Tap the blue mic button. Speak naturally. Say as many items as you like. The mic stops by itself after 10 seconds of silence.</p>
+
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+
+    <!-- LISTENING STATE -->
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div><div class="sc-sub">What you have at home.</div></div>
+          <div class="sc-mic active"><span class="sc-mic-icon">🎤</span><span>Listening… stops automatically</span></div>
+          <div class="sc-hint">Say as many items as you like — pause briefly between items so each is heard clearly. Stops automatically after 10 seconds of silence.</div>
+          <div class="sc-transcript">🎧 "rice, watermelon and 5 pounds steak"</div>
+          <div class="sc-vlog">
+            <div class="sc-vlog-title"><span>🎤 Just added — 3 items (7 pcs total)</span><span class="sc-vlog-undo">↩ Undo last</span></div>
+            <div class="sc-vlog-row"><span>Rice</span><b>×1</b></div>
+            <div class="sc-vlog-row"><span>Watermelon</span><b>×1</b></div>
+            <div class="sc-vlog-row"><span>Steak (lb)</span><b>×5</b></div>
+          </div>
+          <div class="ring" style="top:38px;left:6px;right:6px;height:26px"></div>
+          <div class="callout down" style="top:68px;left:10px">Blue = listening now</div>
+          <div class="ring" style="top:120px;left:6px;right:6px;height:24px"></div>
+          <div class="callout up" style="top:148px;right:4px">What the phone heard</div>
+          <div class="ring" style="top:150px;left:6px;right:6px;height:80px"></div>
+          <div class="callout down" style="top:235px;left:10px">Green = just added. Tap ↩ to undo</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>While listening</h3>
+        <p>The button turns blue. A blue transcript bubble shows exactly what was heard. The green panel lists everything added this session.</p>
+        <div class="tip">🗣 Pause briefly between items: <em>"milk … two apples … bread"</em></div>
+      </div>
+    </div>
+
+    <!-- VOICE RESULT -->
+    <div class="card">
+      <div class="card-body" style="padding-top:16px">
+        <h3>Voice commands</h3>
+        <table>
+          <thead><tr><th>Say…</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr><td><em>"rice, watermelon and 5 pounds steak"</em></td><td>3 items added with quantities</td></tr>
+            <tr><td><em>"add 2 milk"</em></td><td>Milk ×2 (merges if exists)</td></tr>
+            <tr><td><em>"3 cans of tomatoes"</em></td><td>Tomatoes (can) ×3</td></tr>
+            <tr><td><em>"chicken eggs"</em></td><td>Adds Chicken eggs ×1<br><small>Say "chicken eggs" — the phone often hears plain "eggs" as the letter X</small></td></tr>
+            <tr><td><em>"out of eggs"</em></td><td>Eggs → 0 + on shopping list</td></tr>
+            <tr><td><em>"remove pasta"</em></td><td>Deletes the item</td></tr>
+            <tr><td><em>"got the milk"</em></td><td>Off shopping list, into pantry</td></tr>
+          </tbody>
+        </table>
+        <div class="tip tip-green" style="margin-top:12px">🐓 <strong>Tip:</strong> Say <em>"chicken eggs"</em> instead of just <em>"eggs"</em> — the phone mishears "eggs" as the letter X. "Chicken eggs" is reliably understood.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ ADD TO PANTRY ═══ -->
+<section class="section" id="add-pantry">
+  <div class="eyebrow">Adding items</div>
+  <h2>Add items to your pantry</h2>
+  <p class="intro">Two ways: voice (fast) or the + Add item button (precise).</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div class="sc-mic active"><span class="sc-mic-icon">🎤</span><span>Listening… stops automatically</span></div>
+          <div class="sc-hint">Say as many items as you like…</div>
+          <div class="sc-transcript">🎧 "two bags of rice"</div>
+          <div class="sc-vlog">
+            <div class="sc-vlog-title"><span>🎤 Just added — 1 item (2 pcs total)</span><span class="sc-vlog-undo">↩ Undo last</span></div>
+            <div class="sc-vlog-row"><span>Rice (bag)</span><b>×2</b></div>
+          </div>
+          <div class="ring" style="top:38px;left:6px;right:6px;height:26px"></div>
+          <div class="callout down" style="top:66px;left:6px">1. Tap mic, speak your items</div>
+          <div class="ring" style="top:150px;left:6px;right:6px;height:50px"></div>
+          <div class="callout down" style="top:204px;left:6px">2. Green panel confirms</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">A</div>
+        <h3>By voice (fastest)</h3>
+        <p>Tap the mic. Speak your items. The green panel shows what was added. Tap ↩ Undo last if anything was misheard.</p>
+        <div class="tip">🗣 <em>"two bags of rice"</em> · <em>"milk, cheese and chicken eggs"</em></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div class="sc-mic"><span class="sc-mic-icon">🎤</span><span>Speak to add or update</span></div>
+          <div class="sc-stats"><div class="sc-stat"><div class="sc-stat-label">Items</div><div class="sc-stat-val">5</div></div><div class="sc-stat"><div class="sc-stat-label">Running low</div><div class="sc-stat-val">2</div></div></div>
+          <div class="sc-add-btn" style="border-color:var(--brand);color:var(--brand);font-weight:700">＋ Add item</div>
+          <div class="ring" style="top:128px;left:6px;right:6px;height:38px"></div>
+          <div class="callout down" style="top:170px;left:20px">Tap here to add manually</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">B</div>
+        <h3>Via + Add item (precise)</h3>
+        <p>Tap <strong>+ Add item</strong>. Type the name, set quantity, pick a category, and optionally add a photo. Tap Save to confirm.</p>
+        <div class="tip">💡 Use this for unusual names or when you want to add a photo right away.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══ SHOPPING ═══ -->
+<section class="section" id="shopping">
+  <div class="eyebrow">Shopping</div>
+  <h2>Using the shopping list in the store</h2>
+  <p class="intro">Two ways to add items to your list, one tap to check them off.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div style="background:#fff;margin:8px;border-radius:10px">
+            <div class="sc-item"><div class="sc-thumb">🥛</div><div style="flex:1"><div class="sc-item-name">Milk</div><div class="sc-item-sub low">Running low</div></div><div class="sc-qtys"><div class="sc-q-btn">−</div><div class="sc-q-num">1</div><div class="sc-q-btn">＋</div></div><div class="sc-to-list" style="color:var(--brand)">📋<small style="color:var(--brand)">to list</small></div></div>
+          </div>
+          <div class="ring" style="top:50px;right:10px;width:36px;height:48px"></div>
+          <div class="callout right" style="top:60px;left:10px">Tap 📋 to list</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">1</div>
+        <h3>From the pantry</h3>
+        <p>Tap the 📋 <strong>to list</strong> button on any pantry item to put it on your shopping list.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🛒 Shopping</div></div>
+          <div class="sc-mic"><span class="sc-mic-icon">🎤</span><span>Speak to add or update</span></div>
+          <div class="sc-add-btn">＋ Add to list</div>
+          <div class="ring" style="top:38px;left:6px;right:6px;height:26px"></div>
+          <div class="callout down" style="top:66px;left:6px">Voice: fastest</div>
+          <div class="ring" style="top:75px;left:6px;right:6px;height:36px"></div>
+          <div class="callout down" style="top:114px;right:4px">Or type it in</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">2</div>
+        <h3>On the shopping screen</h3>
+        <p>Switch to 🛒 Shopping. Tap the mic and say items, or tap <strong>+ Add to list</strong> to type one in.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🛒 Shopping</div></div>
+          <div style="background:#fff;margin:8px;border-radius:10px">
+            <div class="sc-shop-item"><div class="sc-thumb">🥛</div><div style="flex:1"><div class="sc-item-name">Milk</div><div class="sc-item-sub">×2</div></div><div class="sc-bin" style="color:var(--brand);font-weight:800">🗑</div></div>
+            <div class="sc-shop-item"><div class="sc-thumb">🌾</div><div style="flex:1"><div class="sc-item-name">Rice</div><div class="sc-item-sub">×1</div></div><div class="sc-bin">🗑</div></div>
+          </div>
+          <div class="ring" style="top:48px;right:10px;width:30px;height:40px"></div>
+          <div class="callout down" style="top:90px;left:4px">Tap 🗑 = in cart → off list → into pantry</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">3</div>
+        <h3>Check off in the store</h3>
+        <p>Item goes in your cart → tap 🗑 → gone from list and added to your pantry. One tap.</p>
+        <div class="tip tip-green">🧺 No checkbox — one tap does everything.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══ FIX MISTAKES ═══ -->
+<section class="section" id="fix">
+  <div class="eyebrow">Fix mistakes</div>
+  <h2>When the phone mishears you</h2>
+  <p class="intro">Three ways to fix a wrong item — from fastest to slowest.</p>
+
+  <div class="tip-bar">
+    <strong>🐓 Say "chicken eggs" — not just "eggs"</strong>
+    The phone often hears "eggs" as the letter X. Saying "chicken eggs" is reliably understood. It appears as "Chicken eggs" in your pantry.
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div class="sc-mic"><span class="sc-mic-icon">🎤</span><span>Speak to add or update</span></div>
+          <div class="sc-vlog">
+            <div class="sc-vlog-title"><span>🎤 Just added — 1 item</span><span class="sc-vlog-undo" style="background:var(--brand);color:#fff">↩ Undo last</span></div>
+            <div class="sc-vlog-row"><span>Hotmail</span><b>×1</b></div>
+          </div>
+          <div class="ring" style="top:78px;right:10px;width:72px;height:22px"></div>
+          <div class="callout down" style="top:103px;right:4px">Tap here immediately</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">1</div>
+        <h3>↩ Undo last — fastest</h3>
+        <p>Right after speaking, the green panel shows what was added. Tap <strong>↩ Undo last</strong> to remove the most recent item. Tap again for the one before.</p>
+        <div class="tip">⚡ Use this immediately while the panel is visible.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div class="sc-mic active"><span class="sc-mic-icon">🎤</span><span>Listening… stops automatically</span></div>
+          <div class="sc-transcript">🎧 "remove hotmail"</div>
+          <div class="ring" style="top:38px;left:6px;right:6px;height:26px"></div>
+          <div class="callout down" style="top:66px;left:6px">Tap mic again, say "remove …"</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">2</div>
+        <h3>"remove …" — by voice</h3>
+        <p>Tap the mic again and say <em>"remove hotmail"</em> (or whatever wrong name appeared). It deletes immediately.</p>
+        <div class="tip">🗣 Example: <em>"remove x"</em> if it added a one-letter mistake.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div style="background:#fff;margin:8px;border-radius:10px">
+            <div class="sc-item" style="background:#fef3e2"><div class="sc-thumb">📦</div><div style="flex:1"><div class="sc-item-name" style="color:var(--brand)">Hotmail</div><div class="sc-item-sub">×1</div></div><div class="sc-qtys"><div class="sc-q-btn">−</div><div class="sc-q-num">1</div><div class="sc-q-btn">＋</div></div><div class="sc-to-list">📋<small>to list</small></div></div>
+          </div>
+          <div class="ring" style="top:46px;left:10px;right:10px;height:46px"></div>
+          <div class="callout down" style="top:94px;left:10px">Tap the item to open editor</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="step-num">3</div>
+        <h3>Tap item → 🗑 Delete</h3>
+        <p>Tap any item to open the Edit screen. Scroll to the bottom and tap the red <strong>🗑 Delete this item</strong> button. Works any time.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══ EDIT & DELETE ═══ -->
+<section class="section" id="edit">
+  <div class="eyebrow">Edit & delete</div>
+  <h2>Editing an item</h2>
+  <p class="intro">Tap any item on the Pantry screen to open the Edit screen.</p>
+
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative;min-height:320px">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div style="background:#fff;margin:8px;border-radius:10px">
+            <div class="sc-item" style="background:#fef3e2"><div class="sc-thumb">🥚</div><div style="flex:1"><div class="sc-item-name" style="color:var(--brand)">Chicken eggs</div><div class="sc-item-sub">×2</div></div></div>
+          </div>
+          <div class="ring" style="top:46px;left:10px;right:10px;height:44px"></div>
+          <div class="callout down" style="top:92px;left:20px">Tap the item</div>
+          <!-- MODAL -->
+          <div class="sc-modal" style="top:auto">
+            <div class="sc-modal-handle"></div>
+            <div class="sc-modal-close">✕</div>
+            <div class="sc-modal-title">Edit item</div>
+            <div class="sc-field"><div class="sc-label">Name</div><div class="sc-input">Chicken eggs</div></div>
+            <div class="sc-field"><div class="sc-label">Quantity</div><div class="sc-input">2</div></div>
+            <div class="sc-field"><div class="sc-label">Category</div><div class="sc-cats"><span class="sc-cat-chip">Staples</span><span class="sc-cat-chip sel">Fresh</span><span class="sc-cat-chip">Frozen</span><span class="sc-cat-chip">Drinks</span></div></div>
+            <div class="sc-actions"><div class="sc-btn-cancel">Cancel</div><div class="sc-btn-save">Save</div></div>
+            <div class="sc-btn-del">🗑 Delete this item</div>
+          </div>
+          <div class="ring" style="bottom:8px;left:10px;right:10px;height:28px"></div>
+          <div class="callout up" style="bottom:38px;left:10px">Red button = delete permanently</div>
+          <div class="ring" style="top:10px;right:10px;width:28px;height:28px;border-radius:50%"></div>
+          <div class="callout right" style="top:14px;left:10px">✕ = go back without saving</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>Edit screen</h3>
+        <p>Change the name, quantity, or category. Tap <strong>Save</strong> to confirm. Tap <strong>🗑 Delete this item</strong> (red) to remove it permanently. Tap <strong>✕</strong> or Cancel to go back without changes.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body" style="padding-top:16px">
+        <h3>What you can do here</h3>
+        <div style="margin-top:8px">
+          <div class="annot-row" style="display:flex;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+            <div><strong style="font-size:13px">Fix a wrong name</strong><p style="font-size:12px;color:var(--text2);margin-top:2px">If voice added "Hotmail", tap the item, change the name to "Oatmeal", tap Save.</p></div>
+          </div>
+          <div class="annot-row" style="display:flex;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+            <div><strong style="font-size:13px">Change category</strong><p style="font-size:12px;color:var(--text2);margin-top:2px">Tap any chip to re-file the item. Auto-categorisation sometimes guesses wrong — this is the override.</p></div>
+          </div>
+          <div class="annot-row" style="display:flex;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+            <div style="width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+            <div><strong style="font-size:13px">Add / change photo</strong><p style="font-size:12px;color:var(--text2);margin-top:2px">Tap 📷 Take / choose photo. The photo then shows on the main Pantry screen.</p></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="width:22px;height:22px;border-radius:6px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+            <div><strong style="font-size:13px">Delete the item</strong><p style="font-size:12px;color:var(--text2);margin-top:2px">Scroll to the bottom and tap the red <strong>🗑 Delete this item</strong> button.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══ PHOTOS ═══ -->
+<section class="section" id="photo">
+  <div class="eyebrow">Photos</div>
+  <h2>📷 Adding a photo to an item</h2>
+  <p class="intro">Photos show as thumbnails on the Pantry screen. They are added in the Edit screen — tap any item to open it.</p>
+
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative;min-height:300px">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div style="background:#fff;margin:8px;border-radius:10px">
+            <div class="sc-item"><div class="sc-thumb">🥚</div><div style="flex:1"><div class="sc-item-name">Chicken eggs</div><div class="sc-item-sub">×2</div></div></div>
+          </div>
+          <div class="ring" style="top:46px;left:10px;right:10px;height:44px"></div>
+          <div class="callout down" style="top:92px;left:16px">Step 1 — tap the item</div>
+          <div class="sc-modal" style="top:auto">
+            <div class="sc-modal-handle"></div>
+            <div class="sc-modal-close">✕</div>
+            <div class="sc-modal-title">Edit item</div>
+            <div class="sc-field"><div class="sc-label">Name</div><div class="sc-input">Chicken eggs</div></div>
+            <div class="sc-field"><div class="sc-label">Category</div><div class="sc-cats"><span class="sc-cat-chip sel">Fresh</span></div></div>
+            <div class="sc-label" style="margin-bottom:4px">Photo (optional)</div>
+            <div style="display:flex;align-items:center;margin-bottom:8px">
+              <div class="sc-photo-btn" style="flex:1">📷 Take / choose photo</div>
+            </div>
+            <div class="sc-actions"><div class="sc-btn-cancel">Cancel</div><div class="sc-btn-save">Save</div></div>
+          </div>
+          <div class="ring" style="bottom:52px;left:10px;right:10px;height:30px"></div>
+          <div class="callout up" style="bottom:84px;left:10px">Step 2 — tap here to pick photo</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>How to add a photo</h3>
+        <p><strong>Step 1:</strong> Tap the item on the Pantry screen.<br><strong>Step 2:</strong> In the Edit screen, tap <strong>📷 Take / choose photo</strong>.<br><strong>Step 3:</strong> Take a photo or pick one from your gallery.<br><strong>Step 4:</strong> Tap <strong>Save</strong>.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="mockup">
+        <div class="mockup-screen" style="position:relative">
+          <div class="sc-header"><div class="sc-title">🥫 Pantry</div></div>
+          <div style="background:#fff;margin:8px;border-radius:10px">
+            <div class="sc-item"><div class="sc-thumb" style="background:#e0f2fe"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Crect width='36' height='36' fill='%23fde68a' rx='8'/%3E%3Cellipse cx='18' cy='20' rx='10' ry='8' fill='%23fbbf24'/%3E%3Cellipse cx='18' cy='18' rx='10' ry='8' fill='%23fef3c7'/%3E%3C/svg%3E"></div><div style="flex:1"><div class="sc-item-name">Chicken eggs</div><div class="sc-item-sub">×2</div></div><div class="sc-qtys"><div class="sc-q-btn">−</div><div class="sc-q-num">2</div><div class="sc-q-btn">＋</div></div><div class="sc-to-list">📋<small>to list</small></div></div>
+            <div class="sc-item"><div class="sc-thumb">🌾</div><div style="flex:1"><div class="sc-item-name">Rice</div><div class="sc-item-sub low">Running low</div></div><div class="sc-qtys"><div class="sc-q-btn">−</div><div class="sc-q-num">1</div><div class="sc-q-btn">＋</div></div><div class="sc-to-list">📋<small>to list</small></div></div>
+          </div>
+          <div class="ring" style="top:46px;left:10px;width:40px;height:44px"></div>
+          <div class="callout right" style="top:54px;left:58px">Photo shows here after saving</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h3>After saving</h3>
+        <p>The photo appears as a thumbnail next to the item name on the main Pantry screen. Items without a photo show a category emoji instead.</p>
+        <div class="tip tip-green">📱 Photos are stored on your device only. They count toward your phone's browser storage — use the More → Export option to back up your pantry including photos.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  PantryPlan · All data stays on your device · Works offline after first load<br>
+  Voice: Chrome (Android) · Safari (iPhone) · Firefox desktop not supported
+</footer>
+
+</body>
+</html>

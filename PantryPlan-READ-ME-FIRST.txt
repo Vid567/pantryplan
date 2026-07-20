@@ -1,0 +1,47 @@
+# PantryPlan — Read Me First
+
+## What is PantryPlan?
+PantryPlan keeps track of what you have at home and what you need to buy — hands-free. Say what you need out loud and everything lands on your list. In the store, one tap moves each item from your list into your pantry.
+
+## What you need
+- A phone with Chrome (Android) or Safari (iPhone)
+- The app hosted on a web address (https) — voice does NOT work when the file is opened directly from phone storage
+- Nothing else: no account, no installation, no internet needed after first load
+
+## Files in this folder
+- pantryplan-app.html   — the app itself
+- PantryPlan-GUIDE.html — visual guide (upload alongside the app, same folder)
+- PantryPlan-READ-ME-FIRST.txt — this file
+- PantryPlan-Voice-Activation-Changes.txt — full technical changelog
+
+## Deploying to Netlify (one-time)
+1. Log in to app.netlify.com → your site → Deploys tab
+2. Drag BOTH files onto the deploy drop zone at once:
+   - pantryplan-app.html
+   - PantryPlan-GUIDE.html
+3. Done — same URL, updated instantly
+
+Do NOT rename pantryplan-app.html to index.html — the guide iframes reference
+it by name. If your Netlify site also hosts DailyCashPlan as index.html, they
+will coexist without conflict.
+
+## Your data & privacy
+- Everything is stored on your own phone — nothing is sent anywhere
+- Voice is processed by your phone's built-in speech recognition
+- Backup: More → Export data. Restore on any device with Import backup
+- Clearing browser data erases the app's data — export first
+
+## Language
+English only — speak English regardless of your phone's language setting.
+(A Dutch version is planned as a separate app.)
+
+## Known limitations
+- Speech recognition sometimes mishears (say "chicken eggs" not just "eggs")
+- Pause briefly between items so each is heard clearly
+- Mic stops automatically after 10 seconds of silence
+- Firefox desktop does not support voice
+
+## Browser support
+- Chrome (Android): full support
+- Safari (iPhone): full support
+- Firefox desktop: voice not supported (type-only fallback shown)

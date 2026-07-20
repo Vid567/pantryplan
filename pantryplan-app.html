@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#b45309">
+<title>PantryPlan</title>
+<style>
+:root {
+  --bg: #faf7f2; --surface: #ffffff; --surface2: #f3efe7;
+  --brand: #b45309; --brand-light: #fef3e2; --brand-dark: #92400e;
+  --green: #059669; --green-light: #d1fae5;
+  --red: #dc2626; --red-light: #fee2e2;
+  --blue: #2563eb; --blue-light: #dbeafe;
+  --amber: #d97706; --amber-light: #fef3c7;
+  --text: #1c1917; --text2: #78716c; --text3: #a8a29e;
+  --border: #e7e0d4; --radius: 16px;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100dvh; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; font-size: inherit; }
+
+.app { max-width: 480px; margin: 0 auto; padding: 0 0 100px; }
+.screen { padding: 20px; display: none; }
+.screen.active { display: block; }
+h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+.subtitle { color: var(--text2); font-size: 15px; margin-top: 4px; margin-bottom: 16px; line-height: 1.4; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+.stat-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.3px; }
+.stat-value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+.input-wrap { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 12px; padding: 0 12px; background: var(--surface); }
+.input-wrap:focus-within { border-color: var(--brand); }
+.input-wrap input, .input-wrap select { flex: 1; border: none; outline: none; font-size: 17px; padding: 12px 0; background: transparent; font-family: var(--font); width: 100%; }
+
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 16px; transition: all .15s; }
+.btn-primary { background: var(--brand); color: white; }
+.btn-primary:active { background: var(--brand-dark); transform: scale(0.98); }
+.btn-secondary { background: var(--surface2); color: var(--text); }
+.btn-sm { padding: 10px 14px; font-size: 14px; width: auto; border-radius: 10px; }
+
+.list-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+.list-item:last-child { border-bottom: none; }
+.thumb { width: 46px; height: 46px; border-radius: 10px; object-fit: cover; background: var(--surface2); flex-shrink: 0; }
+.thumb.ph { display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.list-item-content { flex: 1; min-width: 0; }
+.list-item-title { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-item-title.done { text-decoration: line-through; color: var(--text3); }
+.list-item-sub { font-size: 13px; color: var(--text2); }
+.qty-btns { display: flex; align-items: center; gap: 4px; }
+.qty-btns button { width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); font-size: 18px; font-weight: 600; color: var(--text); }
+.qty-btns button:active { background: var(--border); }
+.qty-num { min-width: 28px; text-align: center; font-weight: 700; font-size: 16px; }
+.icon-btn { padding: 8px; border-radius: 8px; color: var(--text3); font-size: 18px; }
+.icon-btn.labeled { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 8px; }
+.icon-btn.labeled small { font-size: 9px; color: var(--text3); font-weight: 600; letter-spacing: .2px; }
+.icon-btn:active { background: var(--surface2); }
+
+.check { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 15px; transition: all .15s; }
+.check.on { background: var(--green); border-color: var(--green); }
+
+.add-btn { width: 100%; padding: 16px; border: 2px dashed var(--border); border-radius: var(--radius); color: var(--text2); font-weight: 500; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.add-btn:active { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+
+/* Voice */
+.voice-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; border-radius: 12px; font-weight: 600; font-size: 15px; margin-bottom: 6px; background: var(--blue-light); color: var(--blue); }
+.voice-btn.active { background: var(--red-light); color: var(--red); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+.voice-hint { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 12px; line-height: 1.5; background: var(--surface2); border-radius: 8px; padding: 8px 12px; }
+.voice-hint em { color: var(--text2); font-style: normal; font-weight: 500; }
+.transcript { background: var(--blue-light); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 14px; color: var(--blue); display: none; }
+.transcript.show { display: block; }
+.vlog { background: var(--green-light); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; display: none; }
+.vlog.show { display: block; }
+.vlog-title { font-size: 13px; font-weight: 700; color: var(--green); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.vlog-undo { background: var(--surface); border: 1px solid var(--green); color: var(--green); border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 600; }
+.vlog-row { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 0; color: var(--text); }
+.vlog-row b { color: var(--green); }
+
+.cat-header { font-weight: 600; font-size: 13px; color: var(--text2); margin: 16px 0 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip { padding: 9px 15px; border-radius: 12px; font-size: 14px; background: var(--surface); font-weight: 500; border: 1.5px solid var(--border); }
+.chip.selected { background: var(--brand-light); color: var(--brand-dark); border-color: var(--brand); }
+
+/* Modal */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200; display: none; align-items: flex-end; }
+.modal.open { display: flex; }
+.modal-content { background: var(--surface); width: 100%; max-width: 480px; margin: 0 auto; border-radius: 20px 20px 0 0; padding: 20px 20px max(20px, env(safe-area-inset-bottom)); max-height: 90dvh; overflow-y: auto; }
+.modal-handle { width: 40px; height: 4px; background: #d6d3d1; border-radius: 2px; margin: 0 auto 16px; }
+.modal-close { position: absolute; top: 14px; right: 16px; width: 32px; height: 32px; border-radius: 10px; background: var(--surface2); color: var(--text2); font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.modal-content { position: relative; }
+.modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+.modal-actions .btn { flex: 1; }
+
+/* Photo */
+.photo-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.photo-preview { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 1px solid var(--border); display: none; }
+.photo-preview.show { display: block; }
+
+/* Tabs */
+.tab-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 100; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; font-size: 11px; color: var(--text3); font-weight: 500; }
+.tab.active { color: var(--brand); }
+.tab .emoji { font-size: 22px; }
+.badge { position: absolute; margin-left: 26px; margin-top: -4px; background: var(--red); color: white; font-size: 10px; font-weight: 700; border-radius: 9px; padding: 1px 5px; min-width: 16px; }
+
+.empty { text-align: center; color: var(--text3); font-size: 14px; padding: 32px 16px; line-height: 1.5; }
+.empty .big { font-size: 40px; display: block; margin-bottom: 8px; }
+
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 300; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 90%; }
+.toast.show { opacity: 1; }
+
+.shop-mode-note { background: var(--green-light); color: var(--green); border-radius: 12px; padding: 10px 14px; font-size: 13px; font-weight: 500; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- PANTRY -->
+  <div class="screen active" id="screen-pantry">
+    <h1>Pantry</h1>
+    <p class="subtitle">What you have at home.</p>
+
+    <button class="voice-btn" id="mic-pantry" onclick="toggleMic('pantry')">🎤 <span>Speak to add or update</span></button>
+    <div class="voice-hint">Say as many items as you like — <em>pause briefly between items</em> so each is heard clearly. Stops automatically after 10 seconds of silence.<br>Try: <em>"rice, watermelon and 5 pounds steak"</em> · <em>"out of eggs"</em> · <em>"remove pasta"</em></div>
+    <div class="transcript" id="tr-pantry"></div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Items</div><div class="stat-value" id="stat-items">0</div></div>
+      <div class="stat"><div class="stat-label">Running low</div><div class="stat-value" id="stat-low">0</div></div>
+    </div>
+
+    <div class="vlog" id="vlog-pantry"></div>
+    <button class="add-btn" onclick="openItemModal()">＋ Add item</button>
+    <div id="pantry-list"></div>
+  </div>
+
+  <!-- SHOPPING -->
+  <div class="screen" id="screen-shop">
+    <h1>Shopping list</h1>
+    <p class="subtitle">Check things off as you shop. Add whatever you spot.</p>
+
+    <button class="voice-btn" id="mic-shop" onclick="toggleMic('shop')">🎤 <span>Speak to add or remove</span></button>
+    <div class="voice-hint">Say as many items as you like — <em>pause briefly between items</em> so each is heard clearly. Stops automatically after 10 seconds of silence.<br>Try: <em>"bananas, 3 yogurt and 2 bags of rice"</em> · <em>"got the milk"</em> · <em>"remove bananas"</em></div>
+    <div class="transcript" id="tr-shop"></div>
+
+    <div class="shop-mode-note" id="shop-progress" style="display:none"></div>
+
+    <div class="vlog" id="vlog-shop"></div>
+    <button class="add-btn" onclick="openShopModal()">＋ Add to list</button>
+    <div id="shop-list"></div>
+
+    <div id="shop-done-actions" style="display:none; margin-top:16px;">
+      <button class="btn btn-primary" onclick="finishShopping()">✓ Done shopping — move bought items to pantry</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS / EXPORT -->
+  <div class="screen" id="screen-more">
+    <h1>More</h1>
+    <p class="subtitle">Your data stays on this device.</p>
+    <div class="card">
+      <button class="btn btn-secondary" onclick="exportData()">⬇ Export data (backup)</button>
+      <div style="height:8px"></div>
+      <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">⬆ Import backup</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+      <div style="height:8px"></div>
+      <button class="btn btn-secondary" style="color:var(--red)" onclick="resetAll()">Erase everything</button>
+    </div>
+    <div class="voice-hint">100% private · works offline · single file · no account</div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab active" data-tab="pantry" onclick="showTab('pantry')"><span class="emoji">🥫</span>Pantry</button>
+    <button class="tab" data-tab="shop" onclick="showTab('shop')"><span class="emoji">🛒</span><span class="badge" id="shop-badge" style="display:none">0</span>Shopping</button>
+    <button class="tab" data-tab="more" onclick="showTab('more')"><span class="emoji">⚙️</span>More</button>
+  </div>
+
+  <!-- ITEM MODAL (pantry) -->
+  <div class="modal" id="modal-item" onclick="if(event.target===this)closeModals()">
+    <div class="modal-content">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeModals()">✕</button>
+      <h2 id="modal-item-title">Add item</h2>
+      <div style="height:12px"></div>
+      <div class="field"><label>Name</label><div class="input-wrap"><input id="f-name" placeholder="e.g. Rice"></div></div>
+      <div class="field"><label>Quantity</label><div class="input-wrap"><input id="f-qty" type="number" inputmode="numeric" value="1" min="0"></div></div>
+      <div class="field"><label>Category</label>
+        <div class="chips" id="f-cats"></div>
+      </div>
+      <div class="field"><label>Photo (optional)</label>
+        <div class="photo-row">
+          <img class="photo-preview" id="f-photo-preview">
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('f-photo').click()">📷 Take / choose photo</button>
+          <input type="file" id="f-photo" accept="image/*" capture="environment" style="display:none" onchange="photoPicked(event)">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveItem()">Save</button>
+      </div>
+      <button class="btn btn-secondary" id="btn-del-item" style="color:var(--red); margin-top:8px; display:none" onclick="deleteItem()">🗑 Delete this item</button>
+    </div>
+  </div>
+
+  <!-- SHOP ADD MODAL -->
+  <div class="modal" id="modal-shop" onclick="if(event.target===this)closeModals()">
+    <div class="modal-content">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeModals()">✕</button>
+      <h2>Add to shopping list</h2>
+      <div style="height:12px"></div>
+      <div class="field"><label>Name</label><div class="input-wrap"><input id="s-name" placeholder="e.g. Bananas"></div></div>
+      <div class="field"><label>Quantity</label><div class="input-wrap"><input id="s-qty" type="number" inputmode="numeric" value="1" min="1"></div></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveShopItem()">Add</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ───────── State ─────────
+const CATS = ["Staples","Fresh","Frozen","Drinks","Snacks","Household","Other"];
+const CAT_EMOJI = {Staples:"🍚",Fresh:"🥬",Frozen:"🧊",Drinks:"🧃",Snacks:"🍪",Household:"🧻",Other:"📦"};
+let state = { pantry: [], shop: [] };
+let editingId = null, pendingPhoto = null, selectedCat = "Staples";
+
+function load(){ try{ const s = localStorage.getItem('pantryplan') || localStorage.getItem('pantrypal'); if(s) state = JSON.parse(s); }catch(e){} }
+function save(){ try{ localStorage.setItem('pantryplan', JSON.stringify(state)); }catch(e){ toast("Storage full — try removing photos"); } }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+// ───────── Tabs ─────────
+function showTab(t){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+(t==='shop'?'shop':t==='more'?'more':'pantry')).classList.add('active');
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
+  stopMic();
+  render();
+}
+
+// ───────── Render ─────────
+function render(){
+  // Pantry
+  const pl = document.getElementById('pantry-list');
+  document.getElementById('stat-items').textContent = state.pantry.length;
+  document.getElementById('stat-low').textContent = state.pantry.filter(i=>i.qty<=1).length;
+  if(!state.pantry.length){
+    pl.innerHTML = `<div class="empty"><span class="big">🥫</span>Your pantry is empty.<br>Tap the mic and say <b>"add 2 milk"</b>.</div>`;
+  } else {
+    let html = '';
+    CATS.forEach(cat=>{
+      const items = state.pantry.filter(i=>i.cat===cat);
+      if(!items.length) return;
+      html += `<div class="cat-header">${CAT_EMOJI[cat]} ${cat}</div><div class="card">`;
+      items.forEach(i=>{
+        html += `<div class="list-item">
+          ${i.photo ? `<img class="thumb" src="${i.photo}">` : `<div class="thumb ph">${CAT_EMOJI[i.cat]}</div>`}
+          <div class="list-item-content" onclick="openItemModal('${i.id}')">
+            <div class="list-item-title">${esc(i.name)}</div>
+            <div class="list-item-sub">${i.qty===0?'Out of stock':i.qty<=1?'Running low':''}</div>
+          </div>
+          <div class="qty-btns">
+            <button onclick="chQty('${i.id}',-1)">−</button>
+            <div class="qty-num">${i.qty}</div>
+            <button onclick="chQty('${i.id}',1)">＋</button>
+          </div>
+          <button class="icon-btn labeled" onclick="toShop('${i.id}')" title="Add to shopping list">📋<small>to list</small></button>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    pl.innerHTML = html;
+  }
+
+  // Shopping
+  const sl = document.getElementById('shop-list');
+  const badge = document.getElementById('shop-badge');
+  badge.style.display = state.shop.length ? '' : 'none';
+  badge.textContent = state.shop.length;
+  document.getElementById('shop-progress').style.display='none';
+  document.getElementById('shop-done-actions').style.display='none';
+
+  if(!state.shop.length){
+    sl.innerHTML = `<div class="empty"><span class="big">🛒</span>Nothing on the list yet.<br>Add from your pantry (🛒 button) or say <b>"add bananas"</b>.</div>`;
+  } else {
+    const row = i => `<div class="list-item">
+      <div class="list-item-content">
+        <div class="list-item-title">${esc(i.name)}</div>
+        <div class="list-item-sub">${i.qty>1?'×'+i.qty:''}</div>
+      </div>
+      <button class="icon-btn" onclick="delShop('${i.id}')" title="In the cart — remove from list">🗑</button>
+    </div>`;
+    sl.innerHTML = `<div class="card">${state.shop.map(row).join('')}</div>`;
+  }
+}
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ───────── Pantry actions ─────────
+function chQty(id,d){ const i = state.pantry.find(x=>x.id===id); if(!i) return; i.qty = Math.max(0, i.qty+d); if(i.qty===0) toast(`${i.name} is out — added to shopping list`), addToShop(i.name,1); save(); render(); }
+function toShop(id){ const i = state.pantry.find(x=>x.id===id); if(i){ addToShop(i.name,1); toast(`${i.name} → shopping list`); } }
+function addToShop(name, qty){
+  const ex = state.shop.find(x=>x.name.toLowerCase()===name.toLowerCase() && !x.done);
+  if(ex) ex.qty += qty; else state.shop.push({id:uid(), name, qty, done:false});
+  save(); render();
+}
+
+// ───────── Item modal ─────────
+function openItemModal(id){
+  editingId = id||null; pendingPhoto = null;
+  document.getElementById('modal-item-title').textContent = id?'Edit item':'Add item';
+  const i = id ? state.pantry.find(x=>x.id===id) : null;
+  document.getElementById('f-name').value = i?i.name:'';
+  document.getElementById('f-qty').value = i?i.qty:1;
+  selectedCat = i?i.cat:'Staples';
+  const pv = document.getElementById('f-photo-preview');
+  if(i&&i.photo){ pv.src=i.photo; pv.classList.add('show'); pendingPhoto=i.photo; } else pv.classList.remove('show');
+  renderCats();
+  document.getElementById('btn-del-item').style.display = id ? '' : 'none';
+  document.getElementById('modal-item').classList.add('open');
+}
+function renderCats(){
+  document.getElementById('f-cats').innerHTML = CATS.map(c=>
+    `<button class="chip ${c===selectedCat?'selected':''}" onclick="selectedCat='${c}';renderCats()">${CAT_EMOJI[c]} ${c}</button>`).join('');
+}
+function photoPicked(e){
+  const f = e.target.files[0]; if(!f) return;
+  const img = new Image();
+  img.onload = ()=>{
+    const c = document.createElement('canvas');
+    const max = 400, r = Math.min(max/img.width, max/img.height, 1);
+    c.width = img.width*r; c.height = img.height*r;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    pendingPhoto = c.toDataURL('image/jpeg', 0.5);  // 0.5 keeps size small for localStorage
+    const pv = document.getElementById('f-photo-preview');
+    pv.src = pendingPhoto; pv.classList.add('show');
+  };
+  img.src = URL.createObjectURL(f);
+}
+function saveItem(){
+  const name = document.getElementById('f-name').value.trim();
+  const qty = Math.max(0, parseInt(document.getElementById('f-qty').value)||0);
+  if(!name){ toast("Give it a name"); return; }
+  if(editingId){
+    const i = state.pantry.find(x=>x.id===editingId);
+    if(i){
+      Object.assign(i, {name, qty, cat:selectedCat, photo:pendingPhoto});
+    } else {
+      // item was removed between open and save — add fresh
+      state.pantry.push({id:uid(), name, qty, cat:selectedCat, photo:pendingPhoto});
+      toast("Item re-added");
+    }
+  } else {
+    state.pantry.push({id:uid(), name, qty, cat:selectedCat, photo:pendingPhoto});
+  }
+  save(); closeModals(); render();
+}
+function deleteItem(){
+  if(!editingId) return;
+  const i = state.pantry.find(x=>x.id===editingId);
+  state.pantry = state.pantry.filter(x=>x.id!==editingId);
+  save(); closeModals(); render();
+  if(i) toast(`${i.name} deleted`);
+}
+function closeModals(){ document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open')); }
+
+// ───────── Shop modal ─────────
+function openShopModal(){ document.getElementById('s-name').value=''; document.getElementById('s-qty').value=1; document.getElementById('modal-shop').classList.add('open'); }
+function saveShopItem(){
+  const name = document.getElementById('s-name').value.trim();
+  const qty = Math.max(1, parseInt(document.getElementById('s-qty').value)||1);
+  if(!name){ toast("Give it a name"); return; }
+  addToShop(name, qty); closeModals();
+}
+function delShop(id){
+  const i = state.shop.find(x=>x.id===id);
+  state.shop = state.shop.filter(x=>x.id!==id);
+  if(i){
+    const p = state.pantry.find(x=>x.name.toLowerCase()===i.name.toLowerCase());
+    if(p){ p.qty += i.qty; /* keep p.photo */ } else state.pantry.push({id:uid(), name:i.name, qty:i.qty, cat:guessCat(i.name), photo:null});
+    toast(`${i.name} → pantry ✓`);
+  }
+  save(); render();
+}
+
+function finishShopping(){
+  const done = state.shop.filter(i=>i.done);
+  done.forEach(s=>{
+    const p = state.pantry.find(x=>x.name.toLowerCase()===s.name.toLowerCase());
+    if(p) p.qty += s.qty;
+    else state.pantry.push({id:uid(), name:s.name, qty:s.qty, cat:s.cat||'Other', photo:s.photo||null});
+  });
+  state.shop = state.shop.filter(i=>!i.done);
+  save(); render();
+  toast(`${done.length} item${done.length!==1?'s':''} moved to pantry ✓`);
+}
+
+// ───────── Voice ─────────
+let rec = null, micCtx = null, silenceT = null, restarts = 0;
+const MIC_SILENCE_MS = 10000;
+const voiceLog = { pantry: [], shop: [] };
+function undoVoice(ctx){
+  const log = voiceLog[ctx];
+  const last = log.pop();
+  if(!last){ renderVlog(ctx); return; }
+  if(ctx==='pantry'){
+    const i = state.pantry.find(x=>x.name.toLowerCase()===last.name.toLowerCase());
+    if(i){ i.qty -= last.qty; if(i.qty<=0) state.pantry = state.pantry.filter(x=>x.id!==i.id); }
+  } else {
+    const i = state.shop.find(x=>x.name.toLowerCase()===last.name.toLowerCase());
+    if(i){ i.qty -= last.qty; if(i.qty<=0) state.shop = state.shop.filter(x=>x.id!==i.id); }
+  }
+  save(); render(); renderVlog(ctx);
+  toast(`Undone: ${last.name} ×${last.qty}`);
+}
+function renderVlog(ctx){
+  const el = document.getElementById('vlog-'+ctx);
+  if(!el) return;
+  const log = voiceLog[ctx];
+  if(!log.length){ el.classList.remove('show'); el.innerHTML=''; return; }
+  const total = log.reduce((a,v)=>a+v.qty,0);
+  el.innerHTML = `<div class="vlog-title"><span>🎤 Just added by voice — ${log.length} item${log.length!==1?'s':''} (${total} pcs total)</span><button class="vlog-undo" onclick="undoVoice('${ctx}')">↩ Undo last</button></div>` +
+    log.map(v=>`<div class="vlog-row"><span>${esc(v.name)}</span><b>×${v.qty}</b></div>`).join('');
+  el.classList.add('show');
+}
+const MIC_RESTARTS = 5;
+function toggleMic(ctx){
+  if(rec){ stopMic(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ toast("Voice not supported in this browser — try Chrome"); return; }
+  micCtx = ctx; restarts = 0;
+  voiceLog[ctx] = []; renderVlog(ctx); restarts = 0;
+  rec = new SR();
+  rec.lang = 'en-US';
+  rec.continuous = true; rec.interimResults = false;
+  rec.onresult = e => {
+    const t = e.results[e.results.length-1][0].transcript.trim();
+    showTr(ctx, t);
+    handleVoice(ctx, t.toLowerCase());
+    resetSilence();   // reset 10s timer on every new word
+  };
+  rec.onend = ()=>{
+    if(!rec) return;
+    if(++restarts > MIC_RESTARTS){ stopMic(); return; }
+    setTimeout(()=>{ if(rec){ try{rec.start();}catch(e){stopMic();} } }, 150);
+  };
+  rec.onerror = e => { if(e.error==='not-allowed'){ toast("Microphone access denied"); stopMic(); } };
+  resetSilence();
+  rec.start();
+  document.getElementById('mic-'+ctx).classList.add('active');
+  document.querySelector('#mic-'+ctx+' span').textContent = 'Listening… stops automatically';
+}
+function resetSilence(){
+  clearTimeout(silenceT);
+  silenceT = setTimeout(()=>{ if(rec){ stopMic(); } }, MIC_SILENCE_MS);
+}
+function stopMic(){ clearTimeout(silenceT); if(rec){ const r=rec; rec=null; try{r.stop();}catch(e){} } stopMicUI(); }
+function stopMicUI(){
+  ['pantry','shop'].forEach(c=>{
+    const b = document.getElementById('mic-'+c); if(!b) return;
+    b.classList.remove('active');
+    b.querySelector('span').textContent = c==='pantry'?'Speak to add or update':'Speak to add or remove';
+  });
+}
+function showTr(ctx, t){ const el = document.getElementById('tr-'+ctx); el.textContent = '🎧 "'+t+'"'; el.classList.add('show'); }
+
+const NUMWORDS = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,a:1,an:1,couple:2,"a couple of":2,"a couple":2,"a few":3};
+const UNITS = {pound:"lb",pounds:"lb",lb:"lb",lbs:"lb",kilo:"kg",kilos:"kg",kilogram:"kg",kilograms:"kg",kg:"kg",gram:"g",grams:"g",ounce:"oz",ounces:"oz",oz:"oz",liter:"L",liters:"L",litre:"L",litres:"L",gallon:"gal",gallons:"gal",bag:"bag",bags:"bag",can:"can",cans:"can",bottle:"bottle",bottles:"bottle",box:"box",boxes:"box",pack:"pack",packs:"pack",carton:"carton",cartons:"carton",dozen:"dozen",loaf:"loaf",loaves:"loaf",jar:"jar",jars:"jar",bunch:"bunch",bunches:"bunch"};
+const CAT_KEYWORDS = {
+  Staples:["rice","pasta","flour","sugar","beans","lentils","oats","oatmeal","bread","potatoes","oil","olive oil","salt","pepper","spices","herbs","baking soda","baking powder","cereal","noodles","vinegar","ketchup","mustard","mayo","mayonnaise","honey","jam","peanut butter"],
+  Fresh:["milk","cheese","yogurt","egg","eggs","butter","meat","steak","chicken","fish","apple","apples","banana","bananas","tomato","tomatoes","watermelon","lettuce","onion","onions","carrot","carrots","fruit","vegetable","vegetables","grapes","orange","oranges","cucumber","paprika","broccoli"],
+  Frozen:["frozen","ice cream","pizza","fries"],
+  Drinks:["water","juice","orange juice","apple juice","cola","soda","lemonade","beer","wine","coffee","tea","milk shake"],
+  Snacks:["chips","cookies","chocolate","candy","nuts","crackers"],
+  Household:["soap","shampoo","toilet paper","detergent","paper towels","trash bags","batteries"]
+};
+const MISHEARS = {"hotmail":"oatmeal","hot mail":"oatmeal"};
+function fixMishear(name){ const n=name.toLowerCase(); return MISHEARS[n] || name; }
+function guessCat(name){
+  const n = name.toLowerCase().trim();
+  // collect all keywords with their category, longest first so "baking soda" beats "soda"
+  const all = [];
+  for(const [cat,kws] of Object.entries(CAT_KEYWORDS)) kws.forEach(k=>all.push([k,cat]));
+  all.sort((a,b)=>b[0].length-a[0].length);
+  for(const [k,cat] of all){
+    if(n===k) return cat;                                     // exact
+    if(new RegExp("(^|\\s)"+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"(s?)($|\\s)").test(n)) return cat; // whole word(s)
+  }
+  return "Other";  // unsure → Other, never a wrong guess
+}
+
+function parseQtyName(s){
+  // "2 milk" · "two milk" · "5 pounds steak" · "3 cans of tomatoes" · "milk"
+  s = s.replace(/^(?:some|the)\s+/,'').trim();
+  const NUMRE = "(\\d+|" + Object.keys(NUMWORDS).sort((a,b)=>b.length-a.length).join("|") + ")";
+  const UNITRE = "(" + Object.keys(UNITS).join("|") + ")";
+  let m = s.match(new RegExp("^"+NUMRE+"\\s+"+UNITRE+"\\s+(?:of\\s+)?(.+)$"));
+  if(m){
+    const qty = NUMWORDS[m[1]] ?? parseInt(m[1]) ?? 1;
+    return { qty, name: m[3], unit: UNITS[m[2]] };
+  }
+  m = s.match(new RegExp("^"+NUMRE+"\\s+(.+)$"));
+  if(m) return { qty: NUMWORDS[m[1]] ?? parseInt(m[1]) ?? 1, name: m[2], unit: null };
+  return { qty: 1, name: s, unit: null };
+}
+
+function splitItems(s){
+  // "rice, watermelon and 5 pounds steak" → ["rice","watermelon","5 pounds steak"]
+  const parts = s.replace(/^(?:and|also|plus)\s+/,'')
+    .split(/\s*,\s*|\s+and\s+|\s+plus\s+|\s+also\s+/)
+    .map(x=>x.trim()).filter(Boolean);
+  // second pass: if a segment contains a NEW quantity mid-way ("melk 2 appels"),
+  // split before that number — speech often drops the "en"/"and"
+  const NUM = "(?:\\d+|"+Object.keys(NUMWORDS).filter(k=>!k.includes(' ')).sort((a,b)=>b.length-a.length).join("|")+")";
+  const midNum = new RegExp("\\s+(?="+NUM+"\\s+\\S)","g");
+  const out = [];
+  parts.forEach(p=>{
+    const m = p.match(new RegExp("^"+NUM+"\\s"));
+    const head = m ? m[0] : "";
+    const rest = p.slice(head.length);
+    rest.split(midNum).forEach((seg,i)=> out.push(i===0 ? (head+seg).trim() : seg.trim()));
+  });
+  return out.filter(Boolean);
+}
+
+function displayName(name, unit){
+  return unit ? `${cap(name)} (${unit})` : cap(name);
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function handleVoice(ctx, t){
+  // Remove/delete
+  let m = t.match(/^(?:remove|delete|take off|scratch)\s+(?:the\s+)?(.+?)(?:\s+from\s+(?:the\s+)?(?:list|cart|pantry))?$/);
+  if(m){
+    const name = m[1];
+    if(ctx==='shop'){
+      const i = state.shop.find(x=>x.name.toLowerCase().includes(name));
+      if(i){ delShop(i.id); toast(`Removed ${i.name} from the list`); } else toast(`Couldn't find "${name}" on the list`);
+    } else {
+      const i = state.pantry.find(x=>x.name.toLowerCase().includes(name));
+      if(i){ state.pantry = state.pantry.filter(x=>x.id!==i.id); save(); render(); toast(`Removed ${i.name} from pantry`); }
+      else toast(`Couldn't find "${name}" in pantry`);
+    }
+    return;
+  }
+  // "got the milk" / "check milk" → mark done (shop)
+  m = t.match(/^(?:got|check|bought|have)\s+(?:the\s+)?(.+)$/);
+  if(m && ctx==='shop'){
+    const i = state.shop.find(x=>x.name.toLowerCase().includes(m[1]));
+    if(i){ delShop(i.id); } else toast(`Couldn't find "${m[1]}"`);
+    return;
+  }
+  // "out of eggs" → qty 0 + shopping list (pantry)
+  m = t.match(/^(?:out of|no more)\s+(.+)$/);
+  if(m && ctx==='pantry'){
+    const i = state.pantry.find(x=>x.name.toLowerCase().includes(m[1]));
+    if(i){ i.qty=0; addToShop(i.name,1); toast(`${i.name}: out of stock → shopping list`); }
+    else { addToShop(cap(m[1]),1); toast(`${cap(m[1])} → shopping list`); }
+    save(); render();
+    return;
+  }
+  // Add
+  m = t.match(/^(?:add|buy|get|i need|we need|need|i want)\s+(?:some\s+)?(.+)$/);
+  const itemText = m ? m[1] : t;   // no command word? treat the whole phrase as items
+  {
+    let parts = splitItems(itemText);
+
+    const addedItems = [];
+    parts.forEach(part=>{
+      let {qty, name, unit} = parseQtyName(part);
+      if(!name) return;
+      name = fixMishear(name);
+      const dname = displayName(name, unit);
+      if(ctx==='pantry'){
+        const ex = state.pantry.find(x=>x.name.toLowerCase()===dname.toLowerCase());
+        if(ex){ ex.qty += qty; /* keep ex.photo */ } else { state.pantry.push({id:uid(), name:dname, qty, cat:guessCat(name), photo:null}); }
+      } else {
+        addToShop(dname, qty);
+      }
+      addedItems.push({name:dname, qty});
+    });
+    save(); render();
+    if(addedItems.length){
+      addedItems.forEach(a=>{
+        const ex = voiceLog[ctx].find(v=>v.name.toLowerCase()===a.name.toLowerCase());
+        if(ex) ex.qty += a.qty; else voiceLog[ctx].push(a);
+      });
+      renderVlog(ctx);
+
+    }
+    return;
+  }
+  toast(`Didn't catch a command — try "add …" or "remove …"`);
+}
+
+// ───────── More ─────────
+function exportData(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pantryplan-backup.json';
+  a.click();
+}
+function importData(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{ state = JSON.parse(r.result); save(); render(); toast("Backup restored ✓"); }catch(err){ toast("That file didn't look right"); } };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(confirm("Erase all pantry and shopping data on this device?")){ state={pantry:[],shop:[]}; save(); render(); toast("All data erased"); }
+}
+
+// ───────── Toast ─────────
+let toastT = null;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+load(); render();
+</script>
+</body>
+</html>
