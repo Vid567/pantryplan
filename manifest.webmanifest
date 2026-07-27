@@ -1,0 +1,11 @@
+{
+  "name": "PantryPlan",
+  "short_name": "PantryPlan",
+  "description": "A private, voice-first pantry and shopping list.",
+  "start_url": "./pantryplan-app-v15.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#faf7f2",
+  "theme_color": "#b45309",
+  "icons": []
+}
