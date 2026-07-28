@@ -131,6 +131,12 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 .toast.show { opacity: 1; }
 
 .shop-mode-note { background: var(--green-light); color: var(--green); border-radius: 12px; padding: 10px 14px; font-size: 13px; font-weight: 500; margin-bottom: 12px; }
+.transfer-guide { font-size:13px; line-height:1.5; }
+.transfer-guide h2 { font-size:17px; margin-bottom:8px; }
+.transfer-guide ol { padding-left:20px; margin:8px 0 10px; }
+.transfer-guide li { margin-bottom:6px; }
+.transfer-guide .safe-note { background:var(--green-light); color:#065f46; border-radius:10px; padding:10px; margin-top:10px; }
+.guide-link { color:var(--blue); font-weight:700; text-decoration:none; }
 </style>
 </head>
 <body>
@@ -180,8 +186,19 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 
   <!-- SETTINGS / EXPORT -->
   <div class="screen" id="screen-more">
-    <h1>More</h1>
-    <p class="subtitle">Your data stays on this device.</p>
+    <h1>Data &amp; backup</h1>
+    <p class="subtitle">PantryPlan stores your pantry, shopping list and photos only on this device. Nothing is automatically uploaded.</p>
+    <div class="card transfer-guide">
+      <h2>Move safely to a new phone</h2>
+      <ol>
+        <li>On your old phone, tap <strong>Export data</strong>.</li>
+        <li><strong>iPhone/iPad:</strong> save the JSON backup in Files or your personal iCloud Drive.<br><strong>Android:</strong> find it in Downloads, or save it to your personal Google Drive.</li>
+        <li>Open PantryPlan on the new phone, go to <strong>More</strong>, then tap <strong>Import backup</strong> and select the file.</li>
+        <li>Check that your pantry, shopping list and photos are present before erasing anything on the old phone.</li>
+      </ol>
+      <p>The same backup works between iPhone and Android.</p>
+      <div class="safe-note"><strong>Keep it private:</strong> the backup can contain your item photos. Store it in your own account and avoid sharing it publicly.</div>
+    </div>
     <div class="card">
       <button class="btn btn-secondary" onclick="exportData()">⬇ Export data (backup)</button>
       <div style="height:8px"></div>
@@ -190,7 +207,7 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
       <div style="height:8px"></div>
       <button class="btn btn-secondary" style="color:var(--red)" onclick="resetAll()">Erase everything</button>
     </div>
-    <div class="voice-hint">100% private · works offline · single file · no account</div>
+    <div class="voice-hint">100% private · works offline · single backup file · no account<br><a class="guide-link" href="PantryPlan-GUIDE.html">Open the full online guide →</a></div>
   </div>
 
   <!-- TAB BAR -->
