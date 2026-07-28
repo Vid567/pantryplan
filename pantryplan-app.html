@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PantryPlan">
 <meta name="theme-color" content="#b45309">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>PantryPlan</title>
 <style>
 :root {
@@ -203,6 +206,7 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
         <div class="photo-row">
           <img class="photo-preview" id="f-photo-preview">
           <button class="btn btn-secondary btn-sm" onclick="document.getElementById('f-photo').click()">📷 Take / choose photo</button>
+          <button class="btn btn-secondary btn-sm" id="f-photo-remove" style="display:none;color:var(--red)" onclick="removePendingPhoto()">Remove</button>
           <input type="file" id="f-photo" accept="image/*" capture="environment" style="display:none" onchange="photoPicked(event)">
         </div>
       </div>
@@ -237,12 +241,73 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 // ───────── State ─────────
 const CATS = ["Staples","Fresh","Frozen","Drinks","Snacks","Household","Other"];
 const CAT_EMOJI = {Staples:"🍚",Fresh:"🥬",Frozen:"🧊",Drinks:"🧃",Snacks:"🍪",Household:"🧻",Other:"📦"};
-let state = { pantry: [], shop: [] };
+const APP_VERSION = "1.5.0-beta.1";
+const SCHEMA_VERSION = 2;
+const emptyState = () => ({ pantry: [], shop: [] });
+let state = emptyState();
+let lastPersistedState = emptyState();
 let editingId = null, pendingPhoto = null, selectedCat = "Staples";
 
-function load(){ try{ const s = localStorage.getItem('pantryplan') || localStorage.getItem('pantrypal'); if(s) state = JSON.parse(s); }catch(e){} }
-function save(){ try{ localStorage.setItem('pantryplan', JSON.stringify(state)); }catch(e){ toast("Storage full — try removing photos"); } }
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const cloneState = value => JSON.parse(JSON.stringify(value));
+function cleanName(value){
+  if(typeof value!=='string') return "";
+  return value.trim().replace(/\s+/g," ").slice(0,120);
+}
+function cleanQty(value, fallback=1){
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.max(0, Math.min(99999, Math.floor(n))) : fallback;
+}
+function cleanPhoto(value){
+  return typeof value==='string' && /^data:image\/(?:jpeg|png|webp);base64,/i.test(value) ? value : null;
+}
+function normalizeState(raw, strict=false){
+  const source = raw && raw.data ? raw.data : raw;
+  if(!source || !Array.isArray(source.pantry) || !Array.isArray(source.shop)){
+    if(strict) throw new Error("Backup must contain pantry and shop lists");
+    return emptyState();
+  }
+  const pantry = source.pantry.map(item=>{
+    const name = cleanName(item&&item.name);
+    if(!name) return null;
+    const cat = CATS.includes(item.cat) ? item.cat : "Other";
+    return {id:cleanName(item.id)||uid(),name,qty:cleanQty(item.qty,0),cat,photo:cleanPhoto(item.photo)};
+  }).filter(Boolean);
+  const shop = source.shop.map(item=>{
+    const name = cleanName(item&&item.name);
+    if(!name) return null;
+    return {id:cleanName(item.id)||uid(),name,qty:Math.max(1,cleanQty(item.qty,1)),done:false};
+  }).filter(Boolean);
+  if(strict && pantry.length!==source.pantry.length) throw new Error("One or more pantry items are invalid");
+  if(strict && shop.length!==source.shop.length) throw new Error("One or more shopping items are invalid");
+  return {pantry,shop};
+}
+function load(){
+  try{
+    const current = localStorage.getItem('pantryplan');
+    const legacy = !current && localStorage.getItem('pantrypal');
+    const stored = current || legacy;
+    state = stored ? normalizeState(JSON.parse(stored)) : emptyState();
+    lastPersistedState = cloneState(state);
+    if(legacy) save();
+  }catch(e){
+    state = emptyState();
+    lastPersistedState = emptyState();
+    setTimeout(()=>toast("Saved data could not be read. Import a backup to restore it."),0);
+  }
+}
+function save(){
+  try{
+    localStorage.setItem('pantryplan', JSON.stringify({schemaVersion:SCHEMA_VERSION,data:state}));
+    lastPersistedState = cloneState(state);
+    return true;
+  }catch(e){
+    state = cloneState(lastPersistedState);
+    toast("Storage is full. The last change was not saved.");
+    setTimeout(render,0);
+    return false;
+  }
+}
 
 // ───────── Tabs ─────────
 function showTab(t){
@@ -303,7 +368,7 @@ function render(){
         <div class="list-item-title">${esc(i.name)}</div>
         <div class="list-item-sub">${i.qty>1?'×'+i.qty:''}</div>
       </div>
-      <button class="icon-btn" onclick="delShop('${i.id}')" title="In the cart — remove from list">🗑</button>
+      <button class="icon-btn" onclick="delShop('${i.id}')" title="Bought — move to pantry" aria-label="Bought ${esc(i.name)} — move to pantry">🗑</button>
     </div>`;
     sl.innerHTML = `<div class="card">${state.shop.map(row).join('')}</div>`;
   }
@@ -311,7 +376,17 @@ function render(){
 const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // ───────── Pantry actions ─────────
-function chQty(id,d){ const i = state.pantry.find(x=>x.id===id); if(!i) return; i.qty = Math.max(0, i.qty+d); if(i.qty===0) toast(`${i.name} is out — added to shopping list`), addToShop(i.name,1); save(); render(); }
+function chQty(id,d){
+  const i = state.pantry.find(x=>x.id===id); if(!i) return;
+  const previous = i.qty;
+  i.qty = Math.max(0, i.qty+d);
+  if(previous>0 && i.qty===0){
+    addToShop(i.name,1);
+    toast(`${i.name} is out — added to shopping list`);
+  } else {
+    save(); render();
+  }
+}
 function toShop(id){ const i = state.pantry.find(x=>x.id===id); if(i){ addToShop(i.name,1); toast(`${i.name} → shopping list`); } }
 function addToShop(name, qty){
   const ex = state.shop.find(x=>x.name.toLowerCase()===name.toLowerCase() && !x.done);
@@ -328,7 +403,9 @@ function openItemModal(id){
   document.getElementById('f-qty').value = i?i.qty:1;
   selectedCat = i?i.cat:'Staples';
   const pv = document.getElementById('f-photo-preview');
-  if(i&&i.photo){ pv.src=i.photo; pv.classList.add('show'); pendingPhoto=i.photo; } else pv.classList.remove('show');
+  if(i&&i.photo){ pv.src=i.photo; pv.classList.add('show'); pendingPhoto=i.photo; }
+  else { pv.removeAttribute('src'); pv.classList.remove('show'); }
+  updatePhotoControls();
   renderCats();
   document.getElementById('btn-del-item').style.display = id ? '' : 'none';
   document.getElementById('modal-item').classList.add('open');
@@ -347,9 +424,19 @@ function photoPicked(e){
     c.getContext('2d').drawImage(img,0,0,c.width,c.height);
     pendingPhoto = c.toDataURL('image/jpeg', 0.5);  // 0.5 keeps size small for localStorage
     const pv = document.getElementById('f-photo-preview');
-    pv.src = pendingPhoto; pv.classList.add('show');
+    pv.src = pendingPhoto; pv.classList.add('show'); updatePhotoControls();
   };
   img.src = URL.createObjectURL(f);
+}
+function updatePhotoControls(){
+  document.getElementById('f-photo-remove').style.display = pendingPhoto ? '' : 'none';
+}
+function removePendingPhoto(){
+  pendingPhoto = null;
+  const pv = document.getElementById('f-photo-preview');
+  pv.removeAttribute('src'); pv.classList.remove('show');
+  document.getElementById('f-photo').value = '';
+  updatePhotoControls();
 }
 function saveItem(){
   const name = document.getElementById('f-name').value.trim();
@@ -458,7 +545,11 @@ function toggleMic(ctx){
     if(++restarts > MIC_RESTARTS){ stopMic(); return; }
     setTimeout(()=>{ if(rec){ try{rec.start();}catch(e){stopMic();} } }, 150);
   };
-  rec.onerror = e => { if(e.error==='not-allowed'){ toast("Microphone access denied"); stopMic(); } };
+  rec.onerror = e => {
+    if(e.error==='not-allowed' || e.error==='service-not-allowed'){ toast("Microphone access denied"); stopMic(); }
+    else if(e.error==='audio-capture'){ toast("No microphone was found"); stopMic(); }
+    else if(e.error==='network'){ toast("Voice recognition needs a network connection in this browser"); stopMic(); }
+  };
   resetSilence();
   rec.start();
   document.getElementById('mic-'+ctx).classList.add('active');
@@ -609,16 +700,26 @@ function handleVoice(ctx, t){
 
 // ───────── More ─────────
 function exportData(){
-  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const backup = {app:"PantryPlan",appVersion:APP_VERSION,schemaVersion:SCHEMA_VERSION,exportedAt:new Date().toISOString(),data:state};
+  const blob = new Blob([JSON.stringify(backup,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'pantryplan-backup.json';
+  a.download = `pantryplan-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function importData(e){
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
-  r.onload = ()=>{ try{ state = JSON.parse(r.result); save(); render(); toast("Backup restored ✓"); }catch(err){ toast("That file didn't look right"); } };
+  r.onload = ()=>{
+    try{
+      const imported = normalizeState(JSON.parse(r.result),true);
+      if(!confirm(`Replace current data with ${imported.pantry.length} pantry and ${imported.shop.length} shopping item(s)?`)) return;
+      state = imported;
+      if(save()){ render(); toast("Backup restored ✓"); }
+    }catch(err){ toast("Invalid backup — nothing was changed"); }
+    finally { e.target.value=''; }
+  };
   r.readAsText(f);
 }
 function resetAll(){
@@ -634,6 +735,9 @@ function toast(msg){
 }
 
 load(); render();
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
+}
 </script>
 </body>
 </html>

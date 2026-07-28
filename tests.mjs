@@ -1,0 +1,52 @@
+import fs from "node:fs";
+import vm from "node:vm";
+import assert from "node:assert/strict";
+
+const html = fs.readFileSync("pantryplan-app.html", "utf8");
+const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert.ok(script, "The app must contain one inline script");
+new Function(script);
+
+const stateCode = script.slice(
+  script.indexOf("const CATS"),
+  script.indexOf("// ───────── Tabs")
+);
+const context = {
+  localStorage: { getItem: () => null, setItem: () => {} },
+  setTimeout: () => {},
+  toast: () => {},
+  render: () => {}
+};
+vm.createContext(context);
+vm.runInContext(stateCode, context);
+const evaluate = expression => vm.runInContext(expression, context);
+
+assert.equal(
+  evaluate(`normalizeState({
+    pantry:[{name:"Rice",qty:2,cat:"Invalid",photo:"javascript:alert(1)"}],
+    shop:[]
+  },true).pantry[0].cat`),
+  "Other"
+);
+assert.equal(
+  evaluate(`normalizeState({
+    data:{pantry:[],shop:[{name:"Milk",qty:0}]}
+  },true).shop[0].qty`),
+  1
+);
+assert.throws(() => evaluate("normalizeState({},true)"));
+
+const manifest = JSON.parse(fs.readFileSync("manifest.webmanifest", "utf8"));
+assert.equal(manifest.start_url, "./pantryplan-app.html");
+new Function(fs.readFileSync("service-worker.js", "utf8"));
+for(const asset of [
+  "index.html",
+  "pantryplan-app.html",
+  "PantryPlan-GUIDE.html",
+  "manifest.webmanifest",
+  "icon.svg"
+]){
+  assert.ok(fs.existsSync(asset), `Missing cached asset: ${asset}`);
+}
+
+console.log("PantryPlan syntax, import validation and PWA asset tests passed.");
