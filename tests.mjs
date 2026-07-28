@@ -15,6 +15,7 @@ assert.match(html, /\.btn-primary \{ background: var\(--green\)/);
 assert.match(html, /Move safely to a new phone/);
 assert.match(html, /The same backup works between iPhone and Android/);
 assert.match(html, /PantryPlan-GUIDE\.html/);
+assert.match(html, /Open the full user guide/);
 assert.match(html, /rec\.maxAlternatives = 5/);
 assert.match(html, /"x":"eggs"/);
 assert.match(html, /"erwten":"peas"/);
