@@ -46,8 +46,8 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 .input-wrap input, .input-wrap select { flex: 1; border: none; outline: none; font-size: 17px; padding: 12px 0; background: transparent; font-family: var(--font); width: 100%; }
 
 .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border-radius: 14px; font-weight: 600; font-size: 16px; transition: all .15s; }
-.btn-primary { background: var(--brand); color: white; }
-.btn-primary:active { background: var(--brand-dark); transform: scale(0.98); }
+.btn-primary { background: var(--green); color: white; }
+.btn-primary:active { background: #15803d; transform: scale(0.98); }
 .btn-secondary { background: var(--surface2); color: var(--text); }
 .btn-sm { padding: 10px 14px; font-size: 14px; width: auto; border-radius: 10px; }
 
@@ -140,10 +140,11 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
   <div class="screen active" id="screen-pantry">
     <h1>Pantry</h1>
     <p class="subtitle">What you have at home.</p>
+    <div class="item-tip"><span aria-hidden="true">👆</span><span><strong>Open the next entry screen:</strong> <strong>Tap a product name</strong>, for example <strong>Milk</strong>. There you can edit details or add a photo.</span></div>
 
     <button class="voice-btn" id="mic-pantry" onclick="toggleMic('pantry')" aria-pressed="false" aria-describedby="status-pantry">🎤 <span>Speak to add or update</span></button>
     <div class="recording-status" id="status-pantry" role="status" aria-live="polite"></div>
-    <div class="voice-hint">Say as many items as you like — <em>pause briefly between items</em> so each is heard clearly. Stops automatically after 10 seconds of silence.<br>Try: <em>"rice, watermelon and 5 pounds steak"</em> · <em>"out of eggs"</em> · <em>"remove pasta"</em></div>
+    <div class="voice-hint"><strong>Speak clearly and firmly</strong>, keep your phone close, and <em>pause briefly between items</em>. Stops automatically after 10 seconds of silence.<br>Try: <em>"rice, watermelon and 2 pounds steak"</em> · <em>"out of eggs"</em> · <em>"remove pasta"</em></div>
     <div class="transcript" id="tr-pantry"></div>
 
     <div class="stats">
@@ -153,7 +154,6 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 
     <div class="vlog" id="vlog-pantry"></div>
     <button class="add-btn" onclick="openItemModal()">＋ Add item</button>
-    <div class="item-tip">📷 Tap a product name to edit details or add a photo.</div>
     <div id="pantry-list"></div>
   </div>
 
@@ -164,7 +164,7 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 
     <button class="voice-btn" id="mic-shop" onclick="toggleMic('shop')" aria-pressed="false" aria-describedby="status-shop">🎤 <span>Speak to add or remove</span></button>
     <div class="recording-status" id="status-shop" role="status" aria-live="polite"></div>
-    <div class="voice-hint">Say as many items as you like — <em>pause briefly between items</em> so each is heard clearly. Stops automatically after 10 seconds of silence.<br>Try: <em>"bananas, 3 yogurt and 2 bags of rice"</em> · <em>"got the milk"</em> · <em>"remove bananas"</em></div>
+    <div class="voice-hint"><strong>Speak clearly and firmly</strong>, keep your phone close, and <em>pause briefly between items</em>. Stops automatically after 10 seconds of silence.<br>Try: <em>"bananas, 3 yogurt and 2 bags of rice"</em> · <em>"got the milk"</em> · <em>"remove bananas"</em></div>
     <div class="transcript" id="tr-shop"></div>
 
     <div class="shop-mode-note" id="shop-progress" style="display:none"></div>
@@ -617,6 +617,8 @@ function guessCat(name){
 
 function parseQtyName(s){
   // "2 milk" · "two milk" · "5 pounds steak" · "3 cans of tomatoes" · "milk"
+  // Android may transcribe "two pound steak" as the currency expression "£2 steak".
+  s = s.replace(/^£\s*(\d+(?:[.,]\d+)?)\s+(.+)$/i, '$1 pound $2');
   s = s.replace(/^(?:some|the)\s+/,'').trim();
   const NUMRE = "(\\d+|" + Object.keys(NUMWORDS).sort((a,b)=>b.length-a.length).join("|") + ")";
   const UNITRE = "(" + Object.keys(UNITS).join("|") + ")";
