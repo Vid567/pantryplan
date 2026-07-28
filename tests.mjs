@@ -19,6 +19,10 @@ assert.match(html, /Open the full user guide/);
 assert.match(html, /rec\.maxAlternatives = 5/);
 assert.match(html, /"x":"eggs"/);
 assert.match(html, /"erwten":"peas"/);
+assert.match(html, /Join the PantryPlan Beta/);
+assert.match(html, /source:"PantryPlan beta"/);
+assert.match(html, /pantryPlanBetaSignup/);
+assert.match(html, /What is your biggest pantry or shopping problem/);
 new Function(script);
 
 const stateCode = script.slice(
@@ -56,6 +60,7 @@ new Function(fs.readFileSync("service-worker.js", "utf8"));
 for(const asset of [
   "index.html",
   "pantryplan-app.html",
+  "content-creator.html",
   "PantryPlan-GUIDE.html",
   "manifest.webmanifest",
   "icon.svg"

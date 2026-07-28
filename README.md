@@ -7,6 +7,7 @@ PantryPlan is an English-language, privacy-first pantry and shopping list that r
 - Landing page: https://vid567.github.io/pantryplan/
 - App: https://vid567.github.io/pantryplan/pantryplan-app.html
 - Guide: https://vid567.github.io/pantryplan/PantryPlan-GUIDE.html
+- Threads content: https://vid567.github.io/pantryplan/content-creator.html
 
 ## Core flow
 
@@ -14,6 +15,7 @@ PantryPlan is an English-language, privacy-first pantry and shopping list that r
 2. Move low or missing items to the shopping list.
 3. In the store, tap the pantry icon when an item is bought. This removes it from the shopping list and adds the purchased quantity to the pantry.
 4. Export a JSON backup before moving to another device or clearing browser data.
+5. After trying the app, users can optionally join the free beta from the More screen.
 
 ## Browser support
 

@@ -188,6 +188,11 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
   <div class="screen" id="screen-more">
     <h1>Data &amp; backup</h1>
     <p class="subtitle">PantryPlan stores your pantry, shopping list and photos only on this device. Nothing is automatically uploaded.</p>
+    <div class="card" style="border:2px solid var(--green)">
+      <h2 style="font-size:18px;margin-bottom:6px">Join the Free Beta</h2>
+      <p class="subtitle" style="margin-bottom:12px">Try PantryPlan first. If it helps, join the beta to share feedback and receive early updates.</p>
+      <button class="btn btn-primary" onclick="openBetaModal()">Join Free Beta</button>
+    </div>
     <div class="card transfer-guide">
       <h2>Move safely to a new phone</h2>
       <ol>
@@ -257,6 +262,34 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
       <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
         <button class="btn btn-primary" onclick="saveShopItem()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BETA SIGNUP MODAL -->
+  <div class="modal" id="modal-beta" onclick="if(event.target===this)closeBetaModal()">
+    <div class="modal-content">
+      <div class="modal-handle"></div>
+      <button class="modal-close" onclick="closeBetaModal()">✕</button>
+      <h2>Join the PantryPlan Beta</h2>
+      <p class="subtitle">Your pantry data stays on your device. Only this form is submitted.</p>
+      <div class="field"><label>Email address *</label><div class="input-wrap"><input id="beta-email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"></div></div>
+      <div class="field"><label>First name</label><div class="input-wrap"><input id="beta-name" type="text" autocomplete="given-name"></div></div>
+      <div class="field"><label>Phone number</label><div class="input-wrap"><input id="beta-phone" type="tel" autocomplete="tel" placeholder="Optional"></div></div>
+      <div class="field"><label>What is your biggest pantry or shopping problem? *</label>
+        <select id="beta-challenge">
+          <option value="">Choose one</option>
+          <option>Buying items I already have</option>
+          <option>Forgetting what is at home</option>
+          <option>Keeping a shopping list updated</option>
+          <option>Food waste</option>
+          <option>Adding products takes too long</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeBetaModal()">Not now</button>
+        <button class="btn btn-primary" id="beta-submit" onclick="submitBetaSignup()">Join Free Beta</button>
       </div>
     </div>
   </div>
@@ -766,6 +799,42 @@ function resetAll(){
   if(confirm("Erase all pantry and shopping data on this device?")){ state={pantry:[],shop:[]}; save(); render(); toast("All data erased"); }
 }
 
+// ───────── Beta signup ─────────
+function openBetaModal(){
+  document.getElementById('modal-beta').classList.add('open');
+}
+function closeBetaModal(){
+  document.getElementById('modal-beta').classList.remove('open');
+}
+async function submitBetaSignup(){
+  const email = document.getElementById('beta-email').value.trim();
+  const firstName = document.getElementById('beta-name').value.trim();
+  const phone = document.getElementById('beta-phone').value.trim();
+  const challenge = document.getElementById('beta-challenge').value;
+  if(!/^\S+@\S+\.\S+$/.test(email)) return toast("Please enter a valid email address.");
+  if(!challenge) return toast("Please choose your biggest pantry or shopping problem.");
+  const button = document.getElementById('beta-submit');
+  button.disabled = true;
+  button.textContent = "Joining…";
+  const signup = {email,firstName,phone,struggle:challenge,source:"PantryPlan beta",joinedAt:new Date().toISOString()};
+  try{
+    await fetch('https://script.google.com/macros/s/AKfycbz_ThEuGBN20RWo_RFHPBmhkTlPnINtISxXTwWM9P-XWZifF8ntVwLGWtar33xFFwxA/exec',{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(signup)
+    });
+    localStorage.setItem('pantryPlanBetaSignup',JSON.stringify(signup));
+    closeBetaModal();
+    toast("You’re in! Welcome to the PantryPlan beta 🎉");
+  }catch(e){
+    toast("We could not save your signup. Please try again.");
+  }finally{
+    button.disabled = false;
+    button.textContent = "Join Free Beta";
+  }
+}
+
 // ───────── Toast ─────────
 let toastT = null;
 function toast(msg){
@@ -775,6 +844,7 @@ function toast(msg){
 }
 
 load(); render();
+if(new URLSearchParams(location.search).get('join')==='beta') openBetaModal();
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));
 }
