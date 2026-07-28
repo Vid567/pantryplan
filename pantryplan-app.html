@@ -71,13 +71,20 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 .check { width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 15px; transition: all .15s; }
 .check.on { background: var(--green); border-color: var(--green); }
 
-.add-btn { width: 100%; padding: 16px; border: 2px dashed var(--border); border-radius: var(--radius); color: var(--text2); font-weight: 500; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
-.add-btn:active { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+.add-btn { width: 100%; padding: 16px; border: 2px solid var(--green); border-radius: var(--radius); color: white; background: var(--green); font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(22,163,74,.18); }
+.add-btn:active { background: #15803d; transform: translateY(1px); }
+.item-tip { display:flex; align-items:center; gap:8px; margin:0 0 10px; padding:9px 11px; border-radius:10px; background:var(--brand-light); color:var(--brand-dark); font-size:12px; line-height:1.35; }
+.edit-affordance { color:var(--text3); font-size:18px; padding-left:2px; }
 
 /* Voice */
 .voice-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px; border-radius: 12px; font-weight: 600; font-size: 15px; margin-bottom: 6px; background: var(--blue-light); color: var(--blue); }
-.voice-btn.active { background: var(--red-light); color: var(--red); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+.voice-btn.active { background: var(--red-light); color: var(--red); border:2px solid var(--red); animation: pulse 1s infinite; }
+.voice-btn.active::before { content:""; width:10px; height:10px; border-radius:50%; background:var(--red); animation:recording-ring 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform:scale(1); } 50% { opacity: .72; transform:scale(.985); } }
+@keyframes recording-ring { 0% { box-shadow:0 0 0 0 rgba(220,38,38,.55); } 100% { box-shadow:0 0 0 9px rgba(220,38,38,0); } }
+.recording-status { display:none; margin:-1px 0 8px; text-align:center; color:var(--red); font-size:13px; font-weight:700; }
+.recording-status.show { display:block; }
+@media (prefers-reduced-motion: reduce) { .voice-btn.active, .voice-btn.active::before { animation:none; } }
 .voice-hint { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 12px; line-height: 1.5; background: var(--surface2); border-radius: 8px; padding: 8px 12px; }
 .voice-hint em { color: var(--text2); font-style: normal; font-weight: 500; }
 .transcript { background: var(--blue-light); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 14px; color: var(--blue); display: none; }
@@ -134,7 +141,8 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
     <h1>Pantry</h1>
     <p class="subtitle">What you have at home.</p>
 
-    <button class="voice-btn" id="mic-pantry" onclick="toggleMic('pantry')">🎤 <span>Speak to add or update</span></button>
+    <button class="voice-btn" id="mic-pantry" onclick="toggleMic('pantry')" aria-pressed="false" aria-describedby="status-pantry">🎤 <span>Speak to add or update</span></button>
+    <div class="recording-status" id="status-pantry" role="status" aria-live="polite"></div>
     <div class="voice-hint">Say as many items as you like — <em>pause briefly between items</em> so each is heard clearly. Stops automatically after 10 seconds of silence.<br>Try: <em>"rice, watermelon and 5 pounds steak"</em> · <em>"out of eggs"</em> · <em>"remove pasta"</em></div>
     <div class="transcript" id="tr-pantry"></div>
 
@@ -145,6 +153,7 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
 
     <div class="vlog" id="vlog-pantry"></div>
     <button class="add-btn" onclick="openItemModal()">＋ Add item</button>
+    <div class="item-tip">📷 Tap a product name to edit details or add a photo.</div>
     <div id="pantry-list"></div>
   </div>
 
@@ -153,7 +162,8 @@ h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
     <h1>Shopping list</h1>
     <p class="subtitle">Check things off as you shop. Add whatever you spot.</p>
 
-    <button class="voice-btn" id="mic-shop" onclick="toggleMic('shop')">🎤 <span>Speak to add or remove</span></button>
+    <button class="voice-btn" id="mic-shop" onclick="toggleMic('shop')" aria-pressed="false" aria-describedby="status-shop">🎤 <span>Speak to add or remove</span></button>
+    <div class="recording-status" id="status-shop" role="status" aria-live="polite"></div>
     <div class="voice-hint">Say as many items as you like — <em>pause briefly between items</em> so each is heard clearly. Stops automatically after 10 seconds of silence.<br>Try: <em>"bananas, 3 yogurt and 2 bags of rice"</em> · <em>"got the milk"</em> · <em>"remove bananas"</em></div>
     <div class="transcript" id="tr-shop"></div>
 
@@ -368,7 +378,7 @@ function render(){
         <div class="list-item-title">${esc(i.name)}</div>
         <div class="list-item-sub">${i.qty>1?'×'+i.qty:''}</div>
       </div>
-      <button class="icon-btn" onclick="delShop('${i.id}')" title="Bought — move to pantry" aria-label="Bought ${esc(i.name)} — move to pantry">🗑</button>
+      <button class="icon-btn labeled" onclick="delShop('${i.id}')" title="Bought — add to pantry" aria-label="Bought ${esc(i.name)} — add to pantry">🥫<small>to pantry</small></button>
     </div>`;
     sl.innerHTML = `<div class="card">${state.shop.map(row).join('')}</div>`;
   }
@@ -532,12 +542,14 @@ function toggleMic(ctx){
   micCtx = ctx; restarts = 0;
   voiceLog[ctx] = []; renderVlog(ctx); restarts = 0;
   rec = new SR();
-  rec.lang = 'en-US';
-  rec.continuous = true; rec.interimResults = false;
+  rec.lang = (navigator.language || 'en-US').toLowerCase().startsWith('nl') ? 'nl-NL' : 'en-US';
+  rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 5;
   rec.onresult = e => {
-    const t = e.results[e.results.length-1][0].transcript.trim();
+    const result = e.results[e.results.length-1];
+    const alternatives = Array.from(result).map(a=>a.transcript.trim()).filter(Boolean);
+    const t = pickSpeechCandidate(alternatives);
     showTr(ctx, t);
-    handleVoice(ctx, t.toLowerCase());
+    if(result.isFinal) handleVoice(ctx, t.toLowerCase());
     resetSilence();   // reset 10s timer on every new word
   };
   rec.onend = ()=>{
@@ -552,8 +564,13 @@ function toggleMic(ctx){
   };
   resetSilence();
   rec.start();
-  document.getElementById('mic-'+ctx).classList.add('active');
-  document.querySelector('#mic-'+ctx+' span').textContent = 'Listening… stops automatically';
+  const activeButton = document.getElementById('mic-'+ctx);
+  activeButton.classList.add('active');
+  activeButton.setAttribute('aria-pressed','true');
+  activeButton.querySelector('span').textContent = 'Listening… tap to stop';
+  const status = document.getElementById('status-'+ctx);
+  status.textContent = '● Recording — speak now';
+  status.classList.add('show');
 }
 function resetSilence(){
   clearTimeout(silenceT);
@@ -564,7 +581,10 @@ function stopMicUI(){
   ['pantry','shop'].forEach(c=>{
     const b = document.getElementById('mic-'+c); if(!b) return;
     b.classList.remove('active');
+    b.setAttribute('aria-pressed','false');
     b.querySelector('span').textContent = c==='pantry'?'Speak to add or update':'Speak to add or remove';
+    const status = document.getElementById('status-'+c);
+    status.classList.remove('show'); status.textContent='';
   });
 }
 function showTr(ctx, t){ const el = document.getElementById('tr-'+ctx); el.textContent = '🎧 "'+t+'"'; el.classList.add('show'); }
@@ -579,8 +599,9 @@ const CAT_KEYWORDS = {
   Snacks:["chips","cookies","chocolate","candy","nuts","crackers"],
   Household:["soap","shampoo","toilet paper","detergent","paper towels","trash bags","batteries"]
 };
-const MISHEARS = {"hotmail":"oatmeal","hot mail":"oatmeal"};
-function fixMishear(name){ const n=name.toLowerCase(); return MISHEARS[n] || name; }
+const MISHEARS = {"hotmail":"oatmeal","hot mail":"oatmeal","x":"eggs","ex":"eggs","acts":"eggs","peace":"peas","piece":"peas","please":"peas","pees":"peas","erwten":"peas","erwt":"peas"};
+function fixMishear(name){ const n=name.toLowerCase().trim(); return MISHEARS[n] || name; }
+function pickSpeechCandidate(alternatives){ if(!alternatives.length) return ''; const score=p=>p.toLowerCase().split(/\s+/).reduce((n,w)=>n+(MISHEARS[w]?3:0),0); return alternatives.slice().sort((a,b)=>score(b)-score(a))[0]; }
 function guessCat(name){
   const n = name.toLowerCase().trim();
   // collect all keywords with their category, longest first so "baking soda" beats "soda"
