@@ -12,12 +12,12 @@ PantryPlan is an English-language, privacy-first pantry and shopping list that r
 
 1. Add or update pantry items manually or by voice.
 2. Move low or missing items to the shopping list.
-3. In the store, tap the bin when an item is bought. This intentionally removes it from the shopping list and adds the purchased quantity to the pantry.
+3. In the store, tap the pantry icon when an item is bought. This removes it from the shopping list and adds the purchased quantity to the pantry.
 4. Export a JSON backup before moving to another device or clearing browser data.
 
 ## Browser support
 
-The app is designed for current Chrome, Edge and Safari releases. Voice uses the browser's Web Speech API, is configured for `en-US`, and may need a network connection. The pantry, shopping list, photos and backups do not require an account.
+The app is designed for current Chrome, Edge and Safari releases. Voice uses the browser's Web Speech API, follows Dutch (`nl-NL`) or English (`en-US`) device language, requests multiple recognition alternatives, and may need a network connection. Common product mishearings are corrected locally. The pantry, shopping list, photos and backups do not require an account.
 
 ## Validation
 

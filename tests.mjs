@@ -5,6 +5,12 @@ import assert from "node:assert/strict";
 const html = fs.readFileSync("pantryplan-app.html", "utf8");
 const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script, "The app must contain one inline script");
+assert.match(html, /aria-live="polite"/);
+assert.match(html, /🥫<small>to pantry<\/small>/);
+assert.match(html, /Tap a product name to edit details or add a photo/);
+assert.match(html, /rec\.maxAlternatives = 5/);
+assert.match(html, /"x":"eggs"/);
+assert.match(html, /"erwten":"peas"/);
 new Function(script);
 
 const stateCode = script.slice(
