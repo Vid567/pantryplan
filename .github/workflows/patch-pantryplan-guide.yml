@@ -1,0 +1,59 @@
+name: Patch PantryPlan guide navigation
+
+on:
+  push:
+    paths:
+      - '.github/workflows/patch-pantryplan-guide.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch-guide:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Add return-to-app buttons
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('PantryPlan-GUIDE.html')
+          text = path.read_text(encoding='utf-8')
+
+          css_marker = 'nav a:hover{background:var(--brand);color:#fff}'
+          css_addition = '''
+          .app-cta{background:var(--green)!important;color:#fff!important;font-weight:800!important;box-shadow:0 3px 10px rgba(5,150,105,.25)}
+          .app-cta:hover{background:#047857!important;color:#fff!important}
+          .bottom-cta{max-width:860px;margin:0 auto;padding:0 16px 28px;text-align:center}
+          .bottom-cta a{display:inline-block;background:var(--green);color:#fff;text-decoration:none;font-weight:800;border-radius:12px;padding:13px 20px;box-shadow:0 3px 10px rgba(5,150,105,.25)}
+          .bottom-cta a:hover{background:#047857}
+          '''
+          if '.app-cta{' not in text:
+              text = text.replace(css_marker, css_marker + '\n' + css_addition)
+
+          nav_marker = '<nav>\n'
+          nav_button = '  <a class="app-cta" href="pantryplan-app.html">← Open PantryPlan</a>\n'
+          if nav_button not in text:
+              text = text.replace(nav_marker, nav_marker + nav_button, 1)
+
+          footer_marker = '<footer>\n'
+          bottom_button = '<div class="bottom-cta"><a href="pantryplan-app.html">← Back to PantryPlan</a></div>\n\n'
+          if bottom_button not in text:
+              text = text.replace(footer_marker, bottom_button + footer_marker, 1)
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Commit guide update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PantryPlan-GUIDE.html
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+          else
+            git commit -m "Add return-to-app buttons to PantryPlan guide"
+            git push
+          fi
