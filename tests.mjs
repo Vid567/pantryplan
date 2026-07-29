@@ -3,8 +3,9 @@ import vm from "node:vm";
 import assert from "node:assert/strict";
 
 const html = fs.readFileSync("pantryplan-app.html", "utf8");
-const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
-assert.ok(script, "The app must contain one inline script");
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
+const script = scripts.find(source => source.includes("const CATS"));
+assert.ok(script, "The app script must be present");
 assert.match(html, /aria-live="polite"/);
 assert.match(html, /🥫<small>to pantry<\/small>/);
 assert.match(html, /Tap a product name/);
