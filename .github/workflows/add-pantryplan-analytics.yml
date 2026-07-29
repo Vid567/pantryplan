@@ -1,0 +1,71 @@
+name: Add PantryPlan Analytics
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-pantryplan-analytics.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  add-analytics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add Google Analytics tag
+        shell: python
+        run: |
+          from pathlib import Path
+
+          files = [
+              Path('index.html'),
+              Path('pantryplan-app.html'),
+              Path('PantryPlan-GUIDE.html'),
+              Path('content-creator.html'),
+          ]
+
+          tag = '''<!-- Google tag (gtag.js) -->
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-9WFJBP0KBN"></script>
+          <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-9WFJBP0KBN');
+          </script>
+          '''
+
+          changed = []
+          for path in files:
+              if not path.exists():
+                  print(f'Skipped missing file: {path}')
+                  continue
+              text = path.read_text(encoding='utf-8')
+              if 'G-9WFJBP0KBN' in text:
+                  print(f'Analytics already present: {path}')
+                  continue
+              if '<head>' not in text:
+                  print(f'Skipped file without <head>: {path}')
+                  continue
+              text = text.replace('<head>', '<head>\n' + tag, 1)
+              path.write_text(text, encoding='utf-8')
+              changed.append(str(path))
+              print(f'Updated: {path}')
+
+          if changed:
+              Path('.analytics-files-changed').write_text('\n'.join(changed), encoding='utf-8')
+
+      - name: Commit changes
+        run: |
+          if [ ! -f .analytics-files-changed ]; then
+            echo "No changes needed."
+            exit 0
+          fi
+          rm .analytics-files-changed
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html pantryplan-app.html PantryPlan-GUIDE.html content-creator.html
+          git commit -m "Add Google Analytics to PantryPlan pages"
+          git push
