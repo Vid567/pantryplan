@@ -30,13 +30,13 @@
 <body>
 <main class="wrap">
   <div class="top">
-    <div><div class="brand">🥫 PantryPlan Content Creator</div><div class="sub">Copy and plan 25 English PantryPlan Threads posts.</div></div>
+    <div><div class="brand">🥫 PantryPlan Content Creator</div><div class="sub">Copy and plan 50 English PantryPlan Threads posts.</div></div>
     <div class="top-actions"><a class="btn secondary" href="index.html">PantryPlan</a><a class="btn secondary" href="PantryPlan-GUIDE.html">Guide</a><button class="btn secondary" onclick="downloadCSV()">Download CSV</button></div>
   </div>
   <section class="panel">
     <div class="controls">
       <div><label for="themeFilter">Theme</label><select id="themeFilter" onchange="renderPosts()"><option value="all">All themes</option><option>Relatable story</option><option>Waste & duplicates</option><option>Shopping clarity</option><option>Easy input</option><option>Simple & private</option></select></div>
-      <div><label for="count">Show posts</label><select id="count" onchange="renderPosts()"><option value="5">5</option><option value="10">10</option><option value="25" selected>25</option></select></div>
+      <div><label for="count">Show posts</label><select id="count" onchange="renderPosts()"><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50" selected>50</option></select></div>
       <div><label for="startDate">Planning start date</label><input id="startDate" type="date"></div>
       <div><label for="postsPerDay">Posts per day</label><select id="postsPerDay"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></div>
       <button class="btn primary" onclick="autoPlan()">Auto-plan visible posts</button>
@@ -78,8 +78,33 @@ const posts=[
 {theme:'Waste & duplicates',hook:'One forgotten can.',body:'One forgotten bottle.\nOne forgotten bag.\n\nMultiply that by a year.'},
 {theme:'Relatable story',hook:'I do not need another productivity app.',body:'I just need to know\nwhether I already have ketchup.'},
 {theme:'Shopping clarity',hook:'The best grocery decision...',body:'Sometimes happens\nbefore leaving home.'},
-{theme:'Shopping clarity',hook:'A simple pantry creates simpler shopping.',body:'Less guessing.\nLess waste.\nLess spending.\n\nThat is the goal.'}
-].map((p,i)=>({...p,id:i+1,text:`${p.hook}\n\n${p.body}\n\nTry PantryPlan free 👇\n${link}`}));
+{theme:'Shopping clarity',hook:'A simple pantry creates simpler shopping.',body:'Less guessing.\nLess waste.\nLess spending.\n\nThat is the goal.'},
+{theme:'Waste & duplicates',hook:'Why did I buy another jar?',body:'Because the first one was hiding.\n\n→ Check before shopping\n→ Move older items forward\n→ Add what you already own\n\nVisible food gets used.'},
+{theme:'Waste & duplicates',hook:'Expired food often starts with forgotten food.',body:'Put soon-to-expire items\nwhere you can see them.\n\nPlan one meal around them.\nA small check can save a full bag.'},
+{theme:'Shopping clarity',hook:'Try the five-minute pantry challenge.',body:'→ Open one cupboard\n→ Add what you use most\n→ Note what is running low\n→ Stop after five minutes\n\nQuick beats perfect.'},
+{theme:'Shopping clarity',hook:'Meal planning starts with what you own.',body:'Check your pantry first.\nThen choose meals.\nThen build the list.\n\nThat order saves money\nand prevents extra shopping.'},
+{theme:'Easy input',hook:'Too tired to type a grocery list?',body:'Say the item instead.\n\nVoice input can capture\nmilk, rice or soap in seconds.\nThe easier the habit,\nthe more likely it lasts.'},
+{theme:'Easy input',hook:'A product photo can beat a long label.',body:'Add a clear photo\nwhen brands look similar.\n\nYou can spot the right item faster\nwithout reading every detail.'},
+{theme:'Shopping clarity',hook:'The list should change when your pantry changes.',body:'Use what is running low\nto build the next shopping list.\n\nLess memory work.\nFewer missed items.\nFewer extras.'},
+{theme:'Relatable story',hook:'Two people. Two shopping trips. Four milks.',body:'Nobody made a bad choice.\nNobody had the full picture.\n\nA shared check before leaving\ncan prevent the duplicate.'},
+{theme:'Simple & private',hook:'People with ADHD do not need more guilt.',body:'They need less to remember.\n\n→ Add items when you notice them\n→ Use photos for quick recognition\n→ Check one list before shopping'},
+{theme:'Shopping clarity',hook:'Quick tip for cheaper grocery trips.',body:'Choose a spending limit.\nCheck what is at home.\nBuy from the list first.\n\nThree small steps\nreduce supermarket guesswork.'},
+{theme:'Waste & duplicates',hook:'Decluttering is not throwing everything away.',body:'Start with one shelf.\n\n→ Group similar items\n→ Move older food forward\n→ Add useful items to inventory\n\nMake the shelf easier to use.'},
+{theme:'Easy input',hook:'Barcode scanning saves the boring part.',body:'Scan when a code is available.\nAdd details only when needed.\n\nA quick entry today\ncan prevent a duplicate next week.'},
+{theme:'Relatable story',hook:'The supermarket aisle felt like a memory test.',body:'Do we have cereal?\nIs the oil nearly empty?\n\nNow I check the inventory.\nThe decision takes seconds.'},
+{theme:'Simple & private',hook:'Myth: home inventory needs hours of setup.',body:'Begin with ten common items.\nAdd more as you use them.\n\nYour inventory can grow\nwith your normal routine.'},
+{theme:'Shopping clarity',hook:'Before: buying just in case.',body:'After: checking what is at home.\n\nThe difference is one small habit.\nIt saves cupboard space\nand keeps the receipt shorter.'},
+{theme:'Simple & private',hook:'Your grocery list can stay private.',body:'No account is required.\nYour inventory stays on your device.\n\nSimple tools can be useful\nwithout collecting your household data.'},
+{theme:'Waste & duplicates',hook:'Use one before buying one.',body:'Pick one forgotten pantry item.\nPlan it into this week.\n\nThen replace it only if needed.\nThat is a tiny food-waste win.'},
+{theme:'Shopping clarity',hook:'A weekly grocery reset takes ten minutes.',body:'→ Check low-stock items\n→ Review the shopping list\n→ Find food to use soon\n→ Plan two easy meals\n\nThen stop.'},
+{theme:'Relatable story',hook:'A full cupboard can still feel empty.',body:'Food is hard to use\nwhen you cannot see what is there.\n\nGroup similar items.\nKeep a simple inventory.\nDinner becomes easier.'},
+{theme:'Shopping clarity',hook:'Do not make your list in the supermarket.',body:'Make it while checking the kitchen.\n\nYou will remember more,\nbuy fewer backups\nand spend less time in the aisles.'},
+{theme:'Easy input',hook:'The best inventory habit happens in the moment.',body:'Used the last can? Update it.\nOpened a new pack? Update it.\n\nTen seconds now\nprevents guessing later.'},
+{theme:'Waste & duplicates',hook:'Buying in bulk is not always saving.',body:'It only saves money\nwhen the food gets used.\n\nCheck space, current stock\nand real usage before buying more.'},
+{theme:'Simple & private',hook:'Inventory confidence feels surprisingly calm.',body:'You know what is available.\nYou know what is low.\nYou know what to buy.\n\nNo perfect kitchen required.'},
+{theme:'Relatable story',hook:'Grocery stress often begins before the store.',body:'No plan. No clear list.\nNo idea what is at home.\n\nA two-minute inventory check\ncan make the whole trip easier.'},
+{theme:'Shopping clarity',hook:'Today, check only one kitchen zone.',body:'Fridge, freezer or cupboard.\nNot all three.\n\nAdd the important items.\nSmall daily habits\nbuild a useful inventory.'}
+].map((p,i)=>({...p,id:i+1,text:i<25?`${p.hook}\n\n${p.body}\n\nTry PantryPlan free 👇\n${link}`:`${p.hook}\n\n${p.body}\n\nTry PantryPlan free:\nhttps://vid567.github.io/pantryplan/`}));
 let plan=JSON.parse(localStorage.getItem('pantryPlanContentPlan')||'{}');
 function visiblePosts(){const theme=document.getElementById('themeFilter').value;const count=Number(document.getElementById('count').value);return posts.filter(p=>theme==='all'||p.theme===theme).slice(0,count)}
 function renderPosts(){const list=visiblePosts();document.getElementById('posts').innerHTML=list.map(p=>`<article class="card ${plan[p.id]?'scheduled':''}"><div class="card-head"><span class="number">Post ${p.id}</span><span class="theme">${p.theme}</span></div><div class="post">${escapeHtml(p.text)}</div><div class="actions"><button class="btn primary" onclick="copyPost(${p.id})">Copy</button><button class="btn secondary" onclick="planOne(${p.id})">${plan[p.id]?'Change time':'Plan'}</button></div></article>`).join('');document.getElementById('postCount').textContent=`${list.length} posts shown`;renderPlanner()}
@@ -91,7 +116,7 @@ function autoPlan(){const start=document.getElementById('startDate').value;if(!s
 function savePlan(){localStorage.setItem('pantryPlanContentPlan',JSON.stringify(plan))}
 function clearPlan(){if(confirm('Clear the complete content plan?')){plan={};savePlan();renderPosts()}}
 function renderPlanner(){const rows=posts.filter(p=>plan[p.id]).sort((a,b)=>plan[a.id].localeCompare(plan[b.id]));document.getElementById('plannedCount').textContent=`${rows.length} planned`;document.getElementById('planner').innerHTML=rows.length?`<table><thead><tr><th>Date & time</th><th>Post</th><th>Opening</th><th></th></tr></thead><tbody>${rows.map(p=>`<tr><td>${plan[p.id]}</td><td>${p.id}</td><td>${escapeHtml(p.hook.replaceAll('\n',' / '))}</td><td><button class="btn ghost" onclick="copyPost(${p.id})">Copy</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No posts planned yet.</div>'}
-function downloadCSV(){const rows=[['Post','Theme','Opening','Full post','Planned date/time'],...posts.map(p=>[p.id,p.theme,p.hook,p.text,plan[p.id]||''])];const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PantryPlan-Threads-25-posts.csv';a.click();URL.revokeObjectURL(a.href)}
+function downloadCSV(){const rows=[['Post','Theme','Opening','Full post','Planned date/time'],...posts.map(p=>[p.id,p.theme,p.hook,p.text,plan[p.id]||''])];const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='PantryPlan-Threads-50-posts.csv';a.click();URL.revokeObjectURL(a.href)}
 document.getElementById('startDate').value=new Date(Date.now()+86400000).toISOString().slice(0,10);renderPosts();
 </script>
 </body>
