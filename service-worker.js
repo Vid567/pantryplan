@@ -1,4 +1,4 @@
-const CACHE_NAME = "pantryplan-v1.5.0-beta.7";
+const CACHE_NAME = "pantryplan-v1.5.0-beta.8";
 const APP_SHELL = [
   "./",
   "./index.html",
