@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>PantryPlan</title><style>html,body,iframe{width:100%;height:100%;margin:0;border:0}body{overflow:hidden;background:#faf7f2}iframe{display:block}</style></head><body><iframe id="app" title="PantryPlan" allow="microphone; camera"></iframe><script>
+const q=new URLSearchParams(location.search);
+const requested=q.get('lang')||localStorage.getItem('pantryPlanLocale')||navigator.language||'en-US';
+const locale=requested.trim()||'en-US';
+localStorage.setItem('pantryPlanLocale',locale);
+document.documentElement.lang=locale.split('-')[0];
+const child=new URL('pantryplan-app.html',location.href);
+if(q.get('join')==='beta') child.searchParams.set('join','beta');
+const frame=document.getElementById('app');
+frame.src=child.href;
+frame.addEventListener('load',()=>{
+  const w=frame.contentWindow;
+  try{
+    Object.defineProperty(w.navigator,'language',{configurable:true,get:()=>locale});
+    Object.defineProperty(w.navigator,'languages',{configurable:true,get:()=>[locale]});
+  }catch(e){}
+  try{
+    if(typeof w.toggleMic==='function'){
+      const source=w.toggleMic.toString();
+      const patched=source.replace(/rec\.lang\s*=\s*[^;]+;/,`rec.lang=${JSON.stringify(locale)};`);
+      if(patched!==source) w.eval(`toggleMic = ${patched}`);
+    }
+  }catch(e){ console.warn('PantryPlan locale patch could not be applied',e); }
+});
+</script></body></html>
