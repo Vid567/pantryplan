@@ -10,6 +10,23 @@ if(q.get('join')==='beta') child.searchParams.set('join','beta');
 const frame=document.getElementById('app');
 frame.src=child.href;
 
+const VOICE_MISHEARS_EN={
+  'hotmail':'oatmeal','hot mail':'oatmeal','x':'eggs','ex':'eggs','acts':'eggs',
+  'peace':'peas','piece':'peas','please':'peas','pees':'peas'
+};
+const VOICE_MISHEARS_NL={
+  'hotmail':'havermout','hot mail':'havermout','peace':'erwten','piece':'erwten',
+  'please':'erwten','pees':'erwten','peas':'erwten','erwt':'erwten','erwten':'erwten'
+};
+function installVoiceLocalePatch(w){
+  const map=isNL?VOICE_MISHEARS_NL:VOICE_MISHEARS_EN;
+  w.__ppVoiceMishears=map;
+  try{
+    w.eval(`fixMishear = function(name){ const n=String(name||'').toLowerCase().trim(); return window.__ppVoiceMishears[n] || name; };`);
+    w.eval(`pickSpeechCandidate = function(alternatives){ if(!alternatives.length) return ''; const score=p=>p.toLowerCase().split(/\\s+/).reduce((n,w)=>n+(window.__ppVoiceMishears[w]?3:0),0); return alternatives.slice().sort((a,b)=>score(b)-score(a))[0]; };`);
+  }catch(e){ console.warn('PantryPlan voice correction locale patch could not be applied',e); }
+}
+
 const NL_EXACT=new Map([
 ['Pantry','Voorraad'],['What you have at home.','Wat je thuis op voorraad hebt.'],
 ['Shopping list','Boodschappenlijst'],['Check things off as you shop. Add whatever you spot.','Vink producten af tijdens het winkelen. Voeg toe wat je nog nodig hebt.'],
@@ -78,6 +95,7 @@ frame.addEventListener('load',()=>{
    if(typeof w.toggleMic==='function'){
      const source=w.toggleMic.toString(); const patched=source.replace(/rec\.lang\s*=\s*[^;]+;/,`rec.lang=${JSON.stringify(locale)};`); if(patched!==source)w.eval(`toggleMic = ${patched}`);
    }
+   installVoiceLocalePatch(w);
  }catch(e){console.warn('PantryPlan locale patch could not be applied',e)}
  if(!isNL)return;
  d.documentElement.lang='nl';
