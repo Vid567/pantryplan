@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /pantryplan-app-corrupt-backup.html
+
+Sitemap: https://vid567.github.io/pantryplan/sitemap.xml
